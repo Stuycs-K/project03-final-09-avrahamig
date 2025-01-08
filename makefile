@@ -1,6 +1,6 @@
-all: player server
+all: player setup
 player: client.o pipe_networking.o
-	@gcc -o client client.o pipe_networking.o
+	@gcc -o player client.o pipe_networking.o
 
 setup: server.o pipe_networking.o
 	@gcc -o setup server.o pipe_networking.o

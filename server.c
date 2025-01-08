@@ -10,7 +10,11 @@ static void sighandler(int signo) {
   }
 }
 
-int main() {
+int main(int argc, char * argv[]) {
+  if (argc == 1) {
+    printf("Please include the number of players\n");
+    return 0;
+  }
   signal(SIGINT, sighandler);
   signal(SIGPIPE, sighandler);
   srand(time(NULL));
@@ -22,13 +26,18 @@ int main() {
   int x = 0;
   char str[16];
 
-  while (1) {
+  int numPlayers = atoi(argv[1]);
+  int players = 0;
+  int childPids[numPlayers];
+
+  while (players < numPlayers) {
     from_client = server_setup();
     remove(WKP);
     int p;
     p = fork();
     if (p) {
-      //RESET TO TOP
+      childPids[players] = p;
+      players++;
     }
     else {
       server_handshake_half(& to_client, from_client);
