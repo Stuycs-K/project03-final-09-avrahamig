@@ -2,8 +2,8 @@
 
 static void sighandler(int signo) {
   if (signo == SIGINT) {
-    remove("./toServer");
-    exit(1);
+    remove(WKP);
+    exit(0);
   }
   if (signo == SIGPIPE) {
     //printf("In sigpipe\n");
@@ -23,9 +23,6 @@ int main(int argc, char * argv[]) {
   int to_client;
   int from_client;
 
-  int x = 0;
-  char str[16];
-
   int numPlayers = atoi(argv[1]);
   int players = 0;
   int childPids[numPlayers];
@@ -44,14 +41,13 @@ int main(int argc, char * argv[]) {
 
       //printf("hi 2nd\n");
       while (1) {
-        x = (int) rand() % 100 + 1;
-        sprintf(str, "%d", x);
+        char str[32] = "";
+        read(from_client, str, 32);
 
-        if (write(to_client, str, 16) == -1) {
+        if (write(to_client, str, strlen(str)) == -1) {
           break;
         }
         //printf("2nd spot\n");
-        sleep(1);
       }
       //printf("3rd spot\n");
       close(to_client);
