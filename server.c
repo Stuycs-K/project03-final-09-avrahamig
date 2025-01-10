@@ -29,6 +29,11 @@ int main(int argc, char * argv[]) {
 
   int p;
 
+  int fds[numPlayers][2];
+  for (int i = 0; i < numPlayers; i++) {
+    pipe(fds[i]);
+  }
+
   while (players < numPlayers) {
     from_client = server_setup();
     remove(WKP);
@@ -54,11 +59,28 @@ int main(int argc, char * argv[]) {
       close(to_client);
       close(from_client);
       //printf("4th spot\n");*/
+
+      printf("Please wait for all players to join. You may think of your opening sentence if you would like.\n");
+      players = numPlayers;
     }
   }
   if (p) {
+    char line[16] = "ready";
     for (int i = 0; i < numPlayers; i++) {
       printf("childPids i: %d\n", childPids[i]);
+    }
+    close(fds[i][READ]);
+    write(fds[i][WRITE], line, sizeof(line));
+  }
+  else {
+    char line[16];
+    char ready[16] = "ready";
+    close(fds[i][WRITE]);
+    read(fds[i][READ], line, sizeof(line));
+    if (! strcmp(line, ready)) {
+      char sentence[64];
+      printf("Please input your opening sentence to this telephone game.\n");
+      read(from_client, sentence, 64);
     }
   }
 

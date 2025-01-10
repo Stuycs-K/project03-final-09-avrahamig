@@ -23,12 +23,8 @@
 #define BUFFER_SIZE 1000
 #define MAX_CLIENTS 100
 
-#define SYN 0
-#define SYN_ACK 1
-#define ACK 2
-#define MESSAGE 3
-#define EXIT 4
-
+#define READ 0
+#define WRITE 1
 
 int server_handshake(int *to_client);
 int client_handshake(int *to_server);
