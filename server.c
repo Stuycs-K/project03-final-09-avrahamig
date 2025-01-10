@@ -60,7 +60,6 @@ int main(int argc, char * argv[]) {
       close(from_client);
       //printf("4th spot\n");*/
 
-      printf("Please wait for all players to join. You may think of your opening sentence if you would like.\n");
       players = numPlayers;
     }
   }
@@ -68,19 +67,26 @@ int main(int argc, char * argv[]) {
     char line[16] = "ready";
     for (int i = 0; i < numPlayers; i++) {
       printf("childPids i: %d\n", childPids[i]);
+      close(fds[i][READ]);
+      write(fds[i][WRITE], line, sizeof(line));
     }
-    close(fds[i][READ]);
-    write(fds[i][WRITE], line, sizeof(line));
   }
   else {
-    char line[16];
-    char ready[16] = "ready";
-    close(fds[i][WRITE]);
-    read(fds[i][READ], line, sizeof(line));
-    if (! strcmp(line, ready)) {
-      char sentence[64];
-      printf("Please input your opening sentence to this telephone game.\n");
-      read(from_client, sentence, 64);
+    for (int i = 0; i < numPlayers; i++) {
+      printf("hey\n");
+      if (getpid() == childPids[i]) {
+        char line[16];
+        char ready[16] = "ready";
+        close(fds[i][WRITE]);
+        read(fds[i][READ], line, sizeof(line));
+        printf("ready: %s\n", ready);
+        if (! strcmp(line, ready)) {
+          char sentence[64];
+          printf("Please input your opening sentence to this telephone game.\n");
+          read(from_client, sentence, 64);
+          printf("Opening sentence: %s\n", sentence);
+        }
+      }
     }
   }
 
