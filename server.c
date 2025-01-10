@@ -27,10 +27,11 @@ int main(int argc, char * argv[]) {
   int players = 0;
   int childPids[numPlayers];
 
+  int p;
+
   while (players < numPlayers) {
     from_client = server_setup();
     remove(WKP);
-    int p;
     p = fork();
     if (p) {
       childPids[players] = p;
@@ -39,7 +40,7 @@ int main(int argc, char * argv[]) {
     else {
       server_handshake_half(& to_client, from_client);
 
-      //printf("hi 2nd\n");
+      /*//printf("hi 2nd\n");
       while (1) {
         char str[32] = "";
         read(from_client, str, 32);
@@ -52,8 +53,23 @@ int main(int argc, char * argv[]) {
       //printf("3rd spot\n");
       close(to_client);
       close(from_client);
-      //printf("4th spot\n");
+      //printf("4th spot\n");*/
     }
   }
+  if (p) {
+    for (int i = 0; i < numPlayers; i++) {
+      printf("childPids i: %d\n", childPids[i]);
+    }
+  }
+
+
+
+
+
+
+
+
+
+
   return 0;
 }
