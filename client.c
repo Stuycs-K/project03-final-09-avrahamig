@@ -14,10 +14,19 @@ int main() {
   int to_server;
   int from_server;
 
-  printf("Please wait for all players to join. You may think of your opening sentence if you would like but please don't type anything.\n");
+  printf("Please wait for all players to join. You may think of your opening sentence if you would like.\n");
 
   from_server = client_handshake( &to_server );
 
+  char ready[16] = "ready";
+  char isReady[16];
+  read(from_server, isReady, 16);
+  if (! strcmp(ready, isReady)) {
+    printf("The game of telephone has begun! Enter your sentence below:\n");
+  }
+  else {
+    printf("There is a bug with the child telling the client the game is ready.\n");
+  }
   char sentence[64];
   fgets(sentence, 64, stdin);
   write(to_server, sentence, strlen(sentence));

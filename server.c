@@ -60,6 +60,7 @@ int main(int argc, char * argv[]) {
       close(from_client);
       //printf("4th spot\n");*/
 
+      childPids[players] = getpid();
       players = numPlayers;
     }
   }
@@ -82,7 +83,7 @@ int main(int argc, char * argv[]) {
         printf("ready: %s\n", ready);
         if (! strcmp(line, ready)) {
           char sentence[64];
-          printf("Please input your opening sentence to this telephone game.\n");
+          write(to_client, ready, 16);
           read(from_client, sentence, 64);
           printf("Opening sentence: %s\n", sentence);
         }
