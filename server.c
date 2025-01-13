@@ -38,6 +38,8 @@ int main(int argc, char * argv[]) {
 
   int p;
 
+  char sent[numPlayers][64];
+
   int fds[numPlayers][2];
   for (int i = 0; i < numPlayers; i++) {
     pipe(fds[i]);
@@ -48,10 +50,12 @@ int main(int argc, char * argv[]) {
     remove(WKP);
     p = fork();
     if (p) {
+      //srand(getpid());
       childPids[players] = p;
       players++;
     }
     else {
+      //srand(getpid());
       server_handshake_half(& to_client, from_client);
 
       /*//printf("hi 2nd\n");
@@ -76,26 +80,37 @@ int main(int argc, char * argv[]) {
   if (p) {
     char line[16] = "ready";
     for (int i = 0; i < numPlayers; i++) {
-      printf("childPids i: %d\n", childPids[i]);
+      //printf("childPids i: %d\n", childPids[i]);
       close(fds[i][READ]);
       write(fds[i][WRITE], line, sizeof(line));
     }
   }
   else {
     for (int i = 0; i < numPlayers; i++) {
-      printf("hey\n");
+      //printf("hey\n");
       if (getpid() == childPids[i]) {
         char line[16];
         char ready[16] = "ready";
         close(fds[i][WRITE]);
         read(fds[i][READ], line, sizeof(line));
         if (! strcmp(line, ready)) {
-          char sentence[64];
           write(to_client, argv[1], 16);
-          read(from_client, sentence, 64);
+          char sentence[64];
+          for (int i = 0; i < numPlayers; i++) {
+          sent[i] = "";
+          sent[i+1] = "";
+          /*read(from_client, sentence, 64);
           printf("Opening sentence: %s\n", sentence);
           editSentence(sentence, 5);
-          printf("Edited sentence: %s\n", sentence);
+          printf("Edited sentence: %s\n", sentence);*/
+          read(from_client, sent[i], 64);
+          printf("Opening sentence: %s\n", sent[i]);
+          editSentence(sent[i], 5);
+          printf("Edited sentence: %s\n", sent[i]);
+          write(to_client, sent[i], 64);
+        }
+        read(from_client, sentence, 64);
+        printf("Final sentence: %s\n", sentence);
         }
       }
     }
