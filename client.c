@@ -18,18 +18,23 @@ int main() {
 
   from_server = client_handshake( &to_server );
 
-  char ready[16] = "ready";
-  char isReady[16];
-  read(from_server, isReady, 16);
-  if (! strcmp(ready, isReady)) {
-    printf("The game of telephone has begun! Enter your sentence below:\n");
-  }
-  else {
-    printf("There is a bug with the child telling the client the game is ready.\n");
-  }
+  char numRoundsStr[16];
+  read(from_server, numRoundsStr, 16);
+  int numRounds = atoi(numRoundsStr);
+  printf("The game of telephone has begun! Enter your sentence below:\n");
+
   char sentence[64];
+  char sents[numRounds*2+1][64];
+
   fgets(sentence, 64, stdin);
   write(to_server, sentence, strlen(sentence));
+
+  for (int i = 0; i < numRounds; i++) {
+    read(from_server, rec1, strlen(rec1));
+    printf("Here is the sentence you received: %s\nWhat do you think it was supposed to say? Enter below:\n", rec1);
+    fgets(sent[1], 64, stdin);
+    write(to_server, sent1, strlen(sent1));
+  }
 
   /*while (1) {
     char pid[32] = "my pid is ";

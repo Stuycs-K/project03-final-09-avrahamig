@@ -89,12 +89,10 @@ int main(int argc, char * argv[]) {
         char ready[16] = "ready";
         close(fds[i][WRITE]);
         read(fds[i][READ], line, sizeof(line));
-        printf("ready: %s\n", ready);
         if (! strcmp(line, ready)) {
           char sentence[64];
-          write(to_client, ready, 16);
+          write(to_client, argv[1], 16);
           read(from_client, sentence, 64);
-          printf("Hi. Pid is: %d\n", getpid());
           printf("Opening sentence: %s\n", sentence);
           editSentence(sentence, 5);
           printf("Edited sentence: %s\n", sentence);
