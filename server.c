@@ -10,6 +10,15 @@ static void sighandler(int signo) {
   }
 }
 
+void editSentence(char * original, int mode) {
+  int len = strlen(original);
+  for (int i = 0; i < mode; i++) {
+    int rando = (int) rand() % len;
+    char letter = (int) rand() % 69 + 58;
+    original[rando] = letter;
+  }
+}
+
 int main(int argc, char * argv[]) {
   if (argc == 1) {
     printf("Please include the number of players\n");
@@ -85,7 +94,10 @@ int main(int argc, char * argv[]) {
           char sentence[64];
           write(to_client, ready, 16);
           read(from_client, sentence, 64);
+          printf("Hi. Pid is: %d\n", getpid());
           printf("Opening sentence: %s\n", sentence);
+          editSentence(sentence, 5);
+          printf("Edited sentence: %s\n", sentence);
         }
       }
     }
