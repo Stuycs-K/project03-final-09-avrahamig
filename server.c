@@ -83,9 +83,9 @@ int main(int argc, char * argv[]) {
       //printf("childPids i: %d\n", childPids[i]);
       close(fds[i][READ]);
       write(fds[i][WRITE], line, sizeof(line));
-      close(fdsToParent[i]][WRITE]);
+      close(fdsToParent[i][WRITE]);
     }
-    for (int currRound = 0, currRound < numPlayers; currRound++) {
+    for (int currRound = 0; currRound < numPlayers; currRound++) {
       for (int i = 0; i < numPlayers; i++) {
         int j = i+1;
         if (j == numPlayers) {
@@ -116,12 +116,12 @@ int main(int argc, char * argv[]) {
             if (currRound < numPlayers - 1) {
               editSentence(sent, 5);
               printf("Edited sentence: %s\n", sent);
-              write(fdsToParent[WRITE], sent, sizeof(sent));
-              read(fds[READ], sentFromPar)
-              //write to file
+              write(fdsToParent[i][WRITE], sent, sizeof(sent));
+              read(fds[i][READ], sentFromPar, 64);
+              write(to_client, sentFromPar, sizeof(sentFromPar));
             }
             else {
-              printf("Final sentence: %s\n", sentence);
+              printf("Final sentence: %s\n", sent);
               //execvp
             }
           }
