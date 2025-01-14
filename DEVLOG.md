@@ -18,3 +18,6 @@ I wasn't at school today for the family reasons you know about. It also hindered
 
 ### 2025-1-10,11 - Game starts appropriately
 The start of the game works. The communication ebtween parent, child, and server is the toughest part of the project, and it seems to be going alright. I can use most of this code for each of the n rounds. The other parts necessary are the changing of the words and the realignment of child-client.
+
+### 2025-1-13 - Sentences Edited
+I wrote a function that edits the sentence by the mode/difficulty amount of characters. I also wrote the client side of the code. Currently, it doesn't switch the client-child every time, which is the hardest part of the project. However, without that, the basic code works.
