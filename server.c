@@ -39,8 +39,10 @@ int main(int argc, char * argv[]) {
   int p;
 
   int fds[numPlayers][2];
+  int fdsToParent[numPlayers][2];
   for (int i = 0; i < numPlayers; i++) {
     pipe(fds[i]);
+    pipe(fdsToParent[i]);
   }
 
   while (players < numPlayers) {
@@ -81,6 +83,16 @@ int main(int argc, char * argv[]) {
       //printf("childPids i: %d\n", childPids[i]);
       close(fds[i][READ]);
       write(fds[i][WRITE], line, sizeof(line));
+      close(fdsToParent[i]][WRITE]);
+    }
+    for (int i = 0; i < numPlayers; i++) {
+      int j = i+1;
+      if (j == numPlayers) {
+        j = 0;
+      }
+      char sentence[64] = "";
+      read(fdsToParent[i][READ], sentence, 64);
+      write(fds[j][WRITE], sentence, sizeof(sentence));
     }
   }
   else {
