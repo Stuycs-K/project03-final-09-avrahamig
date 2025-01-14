@@ -85,14 +85,17 @@ int main(int argc, char * argv[]) {
       write(fds[i][WRITE], line, sizeof(line));
       close(fdsToParent[i]][WRITE]);
     }
-    for (int i = 0; i < numPlayers; i++) {
-      int j = i+1;
-      if (j == numPlayers) {
-        j = 0;
+    for (int currRound = 0, currRound < numPlayers; currRound++) {
+      for (int i = 0; i < numPlayers; i++) {
+        int j = i+1;
+        if (j == numPlayers) {
+          j = 0;
+        }
+        char sentence[64] = "";
+        read(fdsToParent[i][READ], sentence, 64);
+        printf("Parent received sentence: %s\n", sentence);
+        write(fds[j][WRITE], sentence, sizeof(sentence));
       }
-      char sentence[64] = "";
-      read(fdsToParent[i][READ], sentence, 64);
-      write(fds[j][WRITE], sentence, sizeof(sentence));
     }
   }
   else {
@@ -105,17 +108,26 @@ int main(int argc, char * argv[]) {
         read(fds[i][READ], line, sizeof(line));
         if (! strcmp(line, ready)) {
           write(to_client, argv[1], 16);
-          char sentence[64] = "";
-          for (int i = 0; i < numPlayers; i++) {
-          char sent[64] = "";
-          read(from_client, sent, 64);
-          printf("Opening sentence: %s\n", sent);
-          editSentence(sent, 5);
-          printf("Edited sentence: %s\n", sent);
-          write(to_client, sent, strlen(sent));
+          for (int currRound = 0; currRound < numPlayers; currRound++) {
+            char sent[64] = "";
+            char sentFromPar[64] = "";
+            read(from_client, sent, 64);
+            printf("Received sentence: %s\n", sent);
+            if (currRound < numPlayers - 1) {
+              editSentence(sent, 5);
+              printf("Edited sentence: %s\n", sent);
+              write(fdsToParent[WRITE], sent, sizeof(sent));
+              read(fds[READ], sentFromPar)
+              //write to file
+            }
+            else {
+              printf("Final sentence: %s\n", sentence);
+              //execvp
+            }
+          }
         }
-        read(from_client, sentence, 64);
-        printf("Final sentence: %s\n", sentence);
+        else {
+          printf("There is a bug with the code saying the game is ready to begin.\n");
         }
       }
     }
