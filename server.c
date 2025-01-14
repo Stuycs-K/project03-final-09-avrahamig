@@ -11,7 +11,7 @@ static void sighandler(int signo) {
 }
 
 void editSentence(char * original, int mode) {
-  int len = strlen(original);
+  int len = strlen(original) - 1;
   for (int i = 0; i < mode; i++) {
     int rando = (int) rand() % len;
     char letter = (int) rand() % 69 + 58;
