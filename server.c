@@ -38,8 +38,6 @@ int main(int argc, char * argv[]) {
 
   int p;
 
-  char sent[numPlayers][64];
-
   int fds[numPlayers][2];
   for (int i = 0; i < numPlayers; i++) {
     pipe(fds[i]);
@@ -95,19 +93,14 @@ int main(int argc, char * argv[]) {
         read(fds[i][READ], line, sizeof(line));
         if (! strcmp(line, ready)) {
           write(to_client, argv[1], 16);
-          char sentence[64];
+          char sentence[64] = "";
           for (int i = 0; i < numPlayers; i++) {
-          sent[i] = "";
-          sent[i+1] = "";
-          /*read(from_client, sentence, 64);
-          printf("Opening sentence: %s\n", sentence);
-          editSentence(sentence, 5);
-          printf("Edited sentence: %s\n", sentence);*/
-          read(from_client, sent[i], 64);
-          printf("Opening sentence: %s\n", sent[i]);
-          editSentence(sent[i], 5);
-          printf("Edited sentence: %s\n", sent[i]);
-          write(to_client, sent[i], 64);
+          char sent[64] = "";
+          read(from_client, sent, 64);
+          printf("Opening sentence: %s\n", sent);
+          editSentence(sent, 5);
+          printf("Edited sentence: %s\n", sent);
+          write(to_client, sent, 64);
         }
         read(from_client, sentence, 64);
         printf("Final sentence: %s\n", sentence);

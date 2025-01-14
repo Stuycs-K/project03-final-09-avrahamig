@@ -24,18 +24,17 @@ int main() {
   printf("The game of telephone has begun! Enter your sentence below:\n");
 
   char sentence[64];
-  char sent[numRounds*2][64];
 
   fgets(sentence, 64, stdin);
   write(to_server, sentence, strlen(sentence));
 
-  for (int i = 0; i < numRounds*2; i+=2) {
-    sent[i] = "";
-    sent[i+1] = "";
-    read(from_server, sent[i], strlen(sent[i]));
-    printf("Here is the sentence you received: %s\nWhat do you think it was supposed to say? Enter below:\n", sent[i]);
-    fgets(sent[i+1], 64, stdin);
-    write(to_server, sent[i+1], strlen(sent[i+1]));
+  for (int i = 0; i < numRounds; i++) {
+    char rec[64] = "";
+    char sent[64] = "";
+    read(from_server, sent, strlen(sent));
+    printf("Here is the sentence you received: %s\nWhat do you think it was supposed to say? Enter below:\n", sent);
+    fgets(rec, 64, stdin);
+    write(to_server, rec, strlen(rec));
   }
 
   /*while (1) {
