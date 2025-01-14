@@ -100,7 +100,7 @@ int main(int argc, char * argv[]) {
           printf("Opening sentence: %s\n", sent);
           editSentence(sent, 5);
           printf("Edited sentence: %s\n", sent);
-          write(to_client, sent, 64);
+          write(to_client, sent, strlen(sent));
         }
         read(from_client, sentence, 64);
         printf("Final sentence: %s\n", sentence);
