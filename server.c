@@ -76,14 +76,19 @@ int main(int argc, char * argv[]) {
     }
     for (int currRound = 0; currRound < numRounds - 1; currRound++) {
       for (int i = 0; i < numPlayers; i++) {
-        int j = i+1;
-        if (j == numPlayers) {
-          j = 0;
-        }
         char sentence[64] = "";
         read(fdsToParent[i][READ], sentence, 64);
-        printf("Parent received sentence: %s\n", sentence);
-        write(fds[j][WRITE], sentence, sizeof(sentence));
+        if (numRounds <= numPlayers) {
+          int j = i+1;
+          if (j == numPlayers) {
+            j = 0;
+          }
+          printf("Parent received sentence: %s\n", sentence);
+          write(fds[j][WRITE], sentence, sizeof(sentence));
+        }
+        else {
+          
+        }
       }
     }
   }
