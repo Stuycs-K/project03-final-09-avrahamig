@@ -21,3 +21,6 @@ The start of the game works. The communication ebtween parent, child, and server
 
 ### 2025-1-13 - Sentences Edited
 I wrote a function that edits the sentence by the mode/difficulty amount of characters. I also wrote the client side of the code. Currently, it doesn't switch the client-child every time, which is the hardest part of the project. However, without that, the basic code works.
+
+### 2025-1-14 - In between rounds works
+I dealt with the toughest part, slightyl changing my strategy. Instead of redoing handshakes, I did a lot of parent-child pipe communication stuff, with unnamed pipes both ways. This is in a "rotating" branch. I made the randomness actually random. The core stuff is nearly done. Lastly, I laid the groundwork on an expansion.
