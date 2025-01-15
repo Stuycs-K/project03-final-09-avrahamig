@@ -90,31 +90,27 @@ int main(int argc, char * argv[]) {
         write(fds[j][WRITE], sentence, sizeof(sentence));
       }
     }
-    int roundsLeft = numRounds - numPlayers;
-    while (roundsLeft >= numPlayers) {
-      for (int postRound = 0; postRound < numPlayers; postRound++) {
-        for (int i = 0; i < numPlayers; i++) {
-          char sentence[64] = "";
-          if (postRound == 0) {
-            char finalSentence[64];
-            read(fdsToParent[i][READ], finalSentence, 64);
-            printf("Final sentence (in parent): %s\n", finalSentence);
-            //write finalSentence to file, execvp
-            int randSent = (int) rand() % 6;
-            strcpy(sentence, extraSentences[randSent]);
-          }
-          else {
-            read(fdsToParent[i][READ], sentence, 64);
-          }
-            int j = i+1;
-            if (j == numPlayers) {
-              j = 0;
-            }
-            printf("Parent received sentence: %s\n", sentence);
-            write(fds[j][WRITE], sentence, sizeof(sentence));
+    for (int currRound = numPlayers - 1; currRound < numRounds; currRound++) {
+      for (int i = 0; i < numPlayers; i++) {
+        char sentence[64] = "";
+        if (postRound == 0) {
+          char finalSentence[64];
+          read(fdsToParent[i][READ], finalSentence, 64);
+          printf("Final sentence (in parent): %s\n", finalSentence);
+          //write finalSentence to file, execvp
+          int randSent = (int) rand() % 6;
+          strcpy(sentence, extraSentences[randSent]);
         }
+        else {
+          read(fdsToParent[i][READ], sentence, 64);
+        }
+        int j = i+1;
+        if (j == numPlayers) {
+          j = 0;
+        }
+        printf("Parent received sentence: %s\n", sentence);
+        write(fds[j][WRITE], sentence, sizeof(sentence));
       }
-      numRounds -= numPlayers;
     }
   }
   else {
