@@ -28,7 +28,7 @@ int main() {
   fgets(sentence, 64, stdin);
   write(to_server, sentence, sizeof(sentence));
 
-  for (int i = 0; i < numRounds - 1; i++) {
+  for (int i = 0; i < numRounds; i++) {
     char rec[64] = "";
     char sent[64] = "";
     read(from_server, rec, 64);
