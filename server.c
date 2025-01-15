@@ -78,6 +78,15 @@ int main(int argc, char * argv[]) {
       write(fds[i][WRITE], line, sizeof(line));
       close(fdsToParent[i][WRITE]);
     }
+    for (int i = 0; i < numPlayers; i++) {
+      char sentence[64] = "";
+      read(fdsToParent[i][READ], sentence, 64);
+      int j = i+1;
+      if (j == numPlayers) {
+        j = 0;
+      }
+      write(fds[j][WRITE], sentence, sizeof(sentence));
+    }
     for (int currRound = 0; currRound < numPlayers - 1; currRound++) {
       for (int i = 0; i < numPlayers; i++) {
         char sentence[64] = "";
@@ -93,8 +102,8 @@ int main(int argc, char * argv[]) {
     for (int currRound = numPlayers - 1; currRound < numRounds; currRound++) {
       for (int i = 0; i < numPlayers; i++) {
         char sentence[64] = "";
-        if (postRound == 0) {
-          char finalSentence[64];
+        if (currRound % numPlayers == numPlayers - 1) {
+          char finalSentence[64] = "";
           read(fdsToParent[i][READ], finalSentence, 64);
           printf("Final sentence (in parent): %s\n", finalSentence);
           //write finalSentence to file, execvp
@@ -127,23 +136,29 @@ int main(int argc, char * argv[]) {
           write(to_client, numRoundsStr, 16);
           char sentence[64] = "";
           read(from_client, sentence, 64);
-          printf("Received sentence (round 0): %s\n", sent);
+          printf("Received sentence (round 0): %s\n", sentence);
+          write(fdsToParent[i][WRITE], sentence, sizeof(sentence));
           for (int currRound = 0; currRound < numRounds; currRound++) {
             char sent[64] = "";
             char sentFromPar[64] = "";
-            if (currRound % numPlayers == numPlayers - 1) {
+            if (currRound == 0 || currRound % numPlayers == numPlayers - 1) {
               char randomSent[64] = "";
               read(fds[i][READ], randomSent, 64);
               write(to_client, randomSent, sizeof(randomSent));
             }
             read(from_client, sent, 64);
             printf("Received sentence: %s\n", sent);
-            if (currRounds == numRounds - 1) {
-              editSentence(sent, 5);
-              printf("Edited sentence: %s\n", sent);
-              write(fdsToParent[i][WRITE], sent, sizeof(sent));
-              read(fds[i][READ], sentFromPar, 64);
-              write(to_client, sentFromPar, sizeof(sentFromPar));
+            if (currRound < numRounds - 1) {
+              if (currRound % numPlayers == numPlayers - 2) {
+                write(fdsToParent[i][WRITE], sent, sizeof(sent));
+              }
+              else {
+                editSentence(sent, 5);
+                printf("Edited sentence: %s\n", sent);
+                write(fdsToParent[i][WRITE], sent, sizeof(sent));
+                read(fds[i][READ], sentFromPar, 64);
+                write(to_client, sentFromPar, sizeof(sentFromPar));
+              }
             }
             else {
               printf("Final sentence: %s\n", sent);
