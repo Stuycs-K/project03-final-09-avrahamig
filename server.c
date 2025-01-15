@@ -21,18 +21,22 @@ void editSentence(char * original, int mode) {
 
 int main(int argc, char * argv[]) {
   if (argc == 1) {
-    printf("Please include the number of players\n");
+    printf("Please include the number of players as a command line argument. If you would like an amount of rounds that is not equal to the number of players, add a second command line argument with the number of rounds.\n");
     return 0;
   }
+
   signal(SIGINT, sighandler);
   signal(SIGPIPE, sighandler);
-  srand(time(NULL));
 
-  //printf("1st spot\n");
+  int numPlayers = atoi(argv[1]);
+  int numRounds = numPlayers;
+  if (argc == 3) {
+    numRounds = atoi(argv[2]);
+  }
+
   int to_client;
   int from_client;
 
-  int numPlayers = atoi(argv[1]);
   int players = 0;
   int childPids[numPlayers];
 
@@ -50,12 +54,12 @@ int main(int argc, char * argv[]) {
     remove(WKP);
     p = fork();
     if (p) {
-      //srand(getpid());
+      srand(getpid());
       childPids[players] = p;
       players++;
     }
     else {
-      //srand(getpid());
+      srand(getpid());
       server_handshake_half(& to_client, from_client);
 
       childPids[players] = getpid();
@@ -70,7 +74,7 @@ int main(int argc, char * argv[]) {
       write(fds[i][WRITE], line, sizeof(line));
       close(fdsToParent[i][WRITE]);
     }
-    for (int currRound = 0; currRound < numPlayers; currRound++) {
+    for (int currRound = 0; currRound < numPlayers - 1; currRound++) {
       for (int i = 0; i < numPlayers; i++) {
         int j = i+1;
         if (j == numPlayers) {
