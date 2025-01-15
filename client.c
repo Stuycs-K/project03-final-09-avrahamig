@@ -34,19 +34,6 @@ int main() {
     read(from_server, rec, 64);
     printf("Here is the sentence you received: %s\nWhat do you think it was supposed to say? Enter below:\n", rec);
     fgets(sent, 64, stdin);
-    write(to_server, sent, strlen(sent));
+    write(to_server, sent, sizeof(sent));
   }
-
-  /*while (1) {
-    char pid[32] = "my pid is ";
-    char id[16] = "";
-    sprintf(id, "%d", getpid());
-    strcat(pid, id);
-    write(to_server, pid, strlen(pid));
-
-    char str[16];
-    read(from_server, str, 16);
-    printf("Returned: %s\n", str);
-    sleep(1);
-  }*/
 }

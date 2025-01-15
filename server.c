@@ -58,21 +58,6 @@ int main(int argc, char * argv[]) {
       //srand(getpid());
       server_handshake_half(& to_client, from_client);
 
-      /*//printf("hi 2nd\n");
-      while (1) {
-        char str[32] = "";
-        read(from_client, str, 32);
-
-        if (write(to_client, str, strlen(str)) == -1) {
-          break;
-        }
-        //printf("2nd spot\n");
-      }
-      //printf("3rd spot\n");
-      close(to_client);
-      close(from_client);
-      //printf("4th spot\n");*/
-
       childPids[players] = getpid();
       players = numPlayers;
     }
