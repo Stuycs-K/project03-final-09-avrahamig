@@ -34,6 +34,8 @@ int main(int argc, char * argv[]) {
     numRounds = atoi(argv[2]);
   }
 
+  printf("numRounds: %d, numPlayers: %d\n", numRounds, numPlayers);
+
   int to_client;
   int from_client;
 
@@ -49,7 +51,7 @@ int main(int argc, char * argv[]) {
     pipe(fdsToParent[i]);
   }
 
-  char extraSentences[128] = {""};
+  char * extraSentences[64] = {"abcdefg", "hijklmnop", "qrstuv", "wxyz", "123456", "7890"};
 
   while (players < numPlayers) {
     from_client = server_setup();
@@ -97,7 +99,7 @@ int main(int argc, char * argv[]) {
             char finalSentence[64];
             read(fdsToParent[i][READ], finalSentence, 64);
             //write finalSentence to file, execvp
-            int randSent = (int) rand() % strlen(extraSentences);
+            int randSent = (int) rand() % 6;
             strcpy(sentence, extraSentences[randSent]);
           }
           else {
@@ -123,7 +125,9 @@ int main(int argc, char * argv[]) {
         close(fds[i][WRITE]);
         read(fds[i][READ], line, sizeof(line));
         if (! strcmp(line, ready)) {
-          write(to_client, argv[2], 16);
+          char numRoundsStr[16];
+          sprintf(numRoundsStr, "%d", numRounds);
+          write(to_client, numRoundsStr, 16);
           for (int currRound = 0; currRound < numRounds; currRound++) {
             char sent[64] = "";
             char sentFromPar[64] = "";
