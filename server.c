@@ -74,7 +74,7 @@ int main(int argc, char * argv[]) {
       write(fds[i][WRITE], line, sizeof(line));
       close(fdsToParent[i][WRITE]);
     }
-    for (int currRound = 0; currRound < numPlayers - 1; currRound++) {
+    for (int currRound = 0; currRound < numRounds - 1; currRound++) {
       for (int i = 0; i < numPlayers; i++) {
         int j = i+1;
         if (j == numPlayers) {
@@ -96,13 +96,13 @@ int main(int argc, char * argv[]) {
         close(fds[i][WRITE]);
         read(fds[i][READ], line, sizeof(line));
         if (! strcmp(line, ready)) {
-          write(to_client, argv[1], 16);
-          for (int currRound = 0; currRound < numPlayers; currRound++) {
+          write(to_client, argv[2], 16);
+          for (int currRound = 0; currRound < numRounds; currRound++) {
             char sent[64] = "";
             char sentFromPar[64] = "";
             read(from_client, sent, 64);
             printf("Received sentence: %s\n", sent);
-            if (currRound < numPlayers - 1) {
+            if (currRound < numRounds - 1) {
               editSentence(sent, 5);
               printf("Edited sentence: %s\n", sent);
               write(fdsToParent[i][WRITE], sent, sizeof(sent));
