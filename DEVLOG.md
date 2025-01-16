@@ -24,3 +24,6 @@ I wrote a function that edits the sentence by the mode/difficulty amount of char
 
 ### 2025-1-14 - In between rounds works
 I dealt with the toughest part, slightyl changing my strategy. Instead of redoing handshakes, I did a lot of parent-child pipe communication stuff, with unnamed pipes both ways. This is in a "rotating" branch. I made the randomness actually random. The core stuff is nearly done. Lastly, I laid the groundwork on an expansion.
+
+### 2025-1-15 - Mixed bag on numRounds
+I spent a lot of time writing and then deleting different versions of numRounds, where numRounds > numPlayers. Right now, the entire game is one round late and it's weird.
