@@ -29,7 +29,7 @@ int main(int argc, char * argv[]) {
   signal(SIGPIPE, sighandler);
 
   int numPlayers = atoi(argv[1]);
-  int numRounds = numPlayers - 1;
+  int numRounds = numPlayers;
   if (argc == 3) {
     numRounds = atoi(argv[2]);
   }
