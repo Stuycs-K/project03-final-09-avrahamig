@@ -78,16 +78,7 @@ int main(int argc, char * argv[]) {
       write(fds[i][WRITE], line, sizeof(line));
       close(fdsToParent[i][WRITE]);
     }
-    for (int i = 0; i < numPlayers; i++) {
-      char sentence[64] = "";
-      read(fdsToParent[i][READ], sentence, 64);
-      int j = i+1;
-      if (j == numPlayers) {
-        j = 0;
-      }
-      write(fds[j][WRITE], sentence, sizeof(sentence));
-    }
-    for (int currRound = 0; currRound < numPlayers - 1; currRound++) {
+    for (int currRound = 0; currRound < numPlayers; currRound++) {
       for (int i = 0; i < numPlayers; i++) {
         char sentence[64] = "";
         read(fdsToParent[i][READ], sentence, 64);
@@ -99,10 +90,10 @@ int main(int argc, char * argv[]) {
         write(fds[j][WRITE], sentence, sizeof(sentence));
       }
     }
-    for (int currRound = numPlayers - 1; currRound < numRounds; currRound++) {
+    for (int currRound = numPlayers; currRound < numRounds; currRound++) {
       for (int i = 0; i < numPlayers; i++) {
         char sentence[64] = "";
-        if (currRound % numPlayers == numPlayers - 1) {
+        if (currRound % numPlayers == 0) {
           char finalSentence[64] = "";
           read(fdsToParent[i][READ], finalSentence, 64);
           printf("Final sentence (in parent): %s\n", finalSentence);
@@ -134,14 +125,10 @@ int main(int argc, char * argv[]) {
           char numRoundsStr[16];
           sprintf(numRoundsStr, "%d", numRounds);
           write(to_client, numRoundsStr, 16);
-          char sentence[64] = "";
-          read(from_client, sentence, 64);
-          printf("Received sentence (round 0): %s\n", sentence);
-          write(fdsToParent[i][WRITE], sentence, sizeof(sentence));
           for (int currRound = 0; currRound < numRounds; currRound++) {
             char sent[64] = "";
             char sentFromPar[64] = "";
-            if (currRound == 0 || currRound % numPlayers == numPlayers - 1) {
+            if (currRound != 0 && currRound % numPlayers == 0) {
               char randomSent[64] = "";
               read(fds[i][READ], randomSent, 64);
               write(to_client, randomSent, sizeof(randomSent));
@@ -149,7 +136,7 @@ int main(int argc, char * argv[]) {
             read(from_client, sent, 64);
             printf("Received sentence: %s\n", sent);
             if (currRound < numRounds - 1) {
-              if (currRound % numPlayers == numPlayers - 2) {
+              if (currRound % numPlayers == numPlayers - 1) {
                 write(fdsToParent[i][WRITE], sent, sizeof(sent));
               }
               else {
