@@ -78,7 +78,7 @@ int main(int argc, char * argv[]) {
       write(fds[i][WRITE], line, sizeof(line));
       close(fdsToParent[i][WRITE]);
     }
-    for (int currRound = 0; currRound < numPlayers; currRound++) {
+    for (int currRound = 0; currRound < numPlayers - 1; currRound++) {
       for (int i = 0; i < numPlayers; i++) {
         char sentence[64] = "";
         read(fdsToParent[i][READ], sentence, 64);
