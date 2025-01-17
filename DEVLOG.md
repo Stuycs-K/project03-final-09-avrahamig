@@ -27,3 +27,6 @@ I dealt with the toughest part, slightyl changing my strategy. Instead of redoin
 
 ### 2025-1-15 - Mixed bag on numRounds
 I spent a lot of time writing and then deleting different versions of numRounds, where numRounds > numPlayers. Right now, the entire game is one round late and it's weird.
+
+### 2025-1-16 - Can't play on temp?
+In class I worked on numRounds again. The first of the two broken parts is fixed, but it still ends one round early weirdly. But in class and in the dojo I ran into an annoying problem. Due to either premission issues or pipe limitations, I couldn't play with somebody else who ssh'ed into temp.
