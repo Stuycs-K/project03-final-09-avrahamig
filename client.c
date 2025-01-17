@@ -26,7 +26,7 @@ int main() {
   char sentence[64];
 
   fgets(sentence, 64, stdin);
-  write(to_server, sentence, strlen(sentence));
+  write(to_server, sentence, sizeof(sentence));
 
   for (int i = 0; i < numRounds - 1; i++) {
     char rec[64] = "";

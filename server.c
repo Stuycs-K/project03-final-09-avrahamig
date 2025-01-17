@@ -21,7 +21,7 @@ void editSentence(char * original, int mode) {
 
 int main(int argc, char * argv[]) {
   if (argc == 1) {
-    printf("Please include the number of players as a command line argument. If you would like an amount of rounds that is not equal to the number of players, add a second command line argument with the number of rounds.\n");
+    printf("Please include the number of players as a command line argument. If you would like an more rounds than the number of players (more games will be created by pre-generated sentences), add a second command line argument with the number of rounds.\n");
     return 0;
   }
 
@@ -33,6 +33,8 @@ int main(int argc, char * argv[]) {
   if (argc == 3) {
     numRounds = atoi(argv[2]);
   }
+
+  printf("numRounds: %d, numPlayers: %d\n", numRounds, numPlayers);
 
   int to_client;
   int from_client;
@@ -48,6 +50,8 @@ int main(int argc, char * argv[]) {
     pipe(fds[i]);
     pipe(fdsToParent[i]);
   }
+
+  char * extraSentences[64] = {"abcdefg", "hijklmnop", "qrstuv", "wxyz", "123456", "7890"};
 
   while (players < numPlayers) {
     from_client = server_setup();
@@ -76,12 +80,34 @@ int main(int argc, char * argv[]) {
     }
     for (int currRound = 0; currRound < numPlayers - 1; currRound++) {
       for (int i = 0; i < numPlayers; i++) {
+        char sentence[64] = "";
+        read(fdsToParent[i][READ], sentence, 64);
         int j = i+1;
         if (j == numPlayers) {
           j = 0;
         }
+        printf("Parent received sentence: %s\n", sentence);
+        write(fds[j][WRITE], sentence, sizeof(sentence));
+      }
+    }
+    for (int currRound = numPlayers; currRound < numRounds; currRound++) {
+      for (int i = 0; i < numPlayers; i++) {
         char sentence[64] = "";
-        read(fdsToParent[i][READ], sentence, 64);
+        if (currRound % numPlayers == 0) {
+          char finalSentence[64] = "";
+          read(fdsToParent[i][READ], finalSentence, 64);
+          printf("Final sentence (in parent): %s\n", finalSentence);
+          //write finalSentence to file, execvp
+          int randSent = (int) rand() % 6;
+          strcpy(sentence, extraSentences[randSent]);
+        }
+        else {
+          read(fdsToParent[i][READ], sentence, 64);
+        }
+        int j = i+1;
+        if (j == numPlayers) {
+          j = 0;
+        }
         printf("Parent received sentence: %s\n", sentence);
         write(fds[j][WRITE], sentence, sizeof(sentence));
       }
@@ -96,18 +122,30 @@ int main(int argc, char * argv[]) {
         close(fds[i][WRITE]);
         read(fds[i][READ], line, sizeof(line));
         if (! strcmp(line, ready)) {
-          write(to_client, argv[1], 16);
-          for (int currRound = 0; currRound < numPlayers; currRound++) {
+          char numRoundsStr[16];
+          sprintf(numRoundsStr, "%d", numRounds);
+          write(to_client, numRoundsStr, 16);
+          for (int currRound = 0; currRound < numRounds; currRound++) {
             char sent[64] = "";
             char sentFromPar[64] = "";
+            if (currRound != 0 && currRound % numPlayers == 0) {
+              char randomSent[64] = "";
+              read(fds[i][READ], randomSent, 64);
+              write(to_client, randomSent, sizeof(randomSent));
+            }
             read(from_client, sent, 64);
             printf("Received sentence: %s\n", sent);
-            if (currRound < numPlayers - 1) {
-              editSentence(sent, 5);
-              printf("Edited sentence: %s\n", sent);
-              write(fdsToParent[i][WRITE], sent, sizeof(sent));
-              read(fds[i][READ], sentFromPar, 64);
-              write(to_client, sentFromPar, sizeof(sentFromPar));
+            if (currRound < numRounds - 1) {
+              if (currRound % numPlayers == numPlayers - 1) {
+                write(fdsToParent[i][WRITE], sent, sizeof(sent));
+              }
+              else {
+                editSentence(sent, 5);
+                printf("Edited sentence: %s\n", sent);
+                write(fdsToParent[i][WRITE], sent, sizeof(sent));
+                read(fds[i][READ], sentFromPar, 64);
+                write(to_client, sentFromPar, sizeof(sentFromPar));
+              }
             }
             else {
               printf("Final sentence: %s\n", sent);
