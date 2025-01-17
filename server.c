@@ -21,12 +21,17 @@ void editSentence(char * original, int mode) {
 
 int main(int argc, char * argv[]) {
   if (argc == 1) {
-    printf("Please include the number of players as a command line argument. If you would like an more rounds than the number of players (more games will be created by pre-generated sentences), add a second command line argument with the number of rounds.\n");
+    printf("Please include the number of players as a command line argument. \nIf you would like an more rounds than the number of players (more games will be created by pre-generated sentences), add a second command line argument with the number of rounds.\n");
     return 0;
   }
 
   signal(SIGINT, sighandler);
   signal(SIGPIPE, sighandler);
+
+  printf("What difficulty mode would you like? Type 1 for easy, 2 for medium, 3 for hard, and 4 for xtreme");
+  char difficulty[16];
+  fgets(difficulty, 16, stdin);
+  int difficultyMode = atoi(difficulty);
 
   int numPlayers = atoi(argv[1]);
   int numRounds = numPlayers;
@@ -100,6 +105,7 @@ int main(int argc, char * argv[]) {
           //write finalSentence to file, execvp
           int randSent = (int) rand() % 6;
           strcpy(sentence, extraSentences[randSent]);
+          editSentence(sentence, difficultyMode);
         }
         else {
           read(fdsToParent[i][READ], sentence, 64);
@@ -140,7 +146,7 @@ int main(int argc, char * argv[]) {
                 write(fdsToParent[i][WRITE], sent, sizeof(sent));
               }
               else {
-                editSentence(sent, 5);
+                editSentence(sent, difficultyMode);
                 printf("Edited sentence: %s\n", sent);
                 write(fdsToParent[i][WRITE], sent, sizeof(sent));
                 read(fds[i][READ], sentFromPar, 64);

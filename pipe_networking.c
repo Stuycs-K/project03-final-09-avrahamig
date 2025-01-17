@@ -12,6 +12,7 @@
 int server_setup() {
   char * wkp = WKP;
   mkfifo(wkp, 0666);
+  chmod(wkp, 0666);
   //printf("1.1\n");
   int from_client = open(wkp, O_RDONLY);
   //printf("1.2\n");
@@ -78,6 +79,7 @@ int client_handshake(int *to_server) {
   sprintf(pp, "%d", p);
   //printf("client 3\n");
   mkfifo(pp, 0666);
+  chmod(pp, 0666);
   //printf("client 4\n");
   *to_server = open(WKP, O_WRONLY);
   //printf("client 5\n");
