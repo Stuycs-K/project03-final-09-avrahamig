@@ -10,13 +10,26 @@ static void sighandler(int signo) {
   }
 }
 
-void editSentence(char * original, int mode) {
-  int len = strlen(original) - 1;
-  for (int i = 0; i < mode; i++) {
-    int rando = (int) rand() % len;
+int editSentence(char * original, char * mode) {
+  if (mode[0] == 'x') {
+    strfry(original);
+    return 0;
+  }
+  if (mode[0] == 'h') {
+    strfry(original);
+    return 0;
+  }
+  int len = strlen(original);
+  int numLets = len / 3;
+  if (mode[0] == 'e') {
+    numLets = len / 4;
+  }
+  for (int i = 0; i < numLets; i++) {
+    int rando = (int) rand() % (len - 1);
     char letter = (int) rand() % 69 + 58;
     original[rando] = letter;
   }
+  return 0;
 }
 
 int main(int argc, char * argv[]) {
@@ -28,10 +41,9 @@ int main(int argc, char * argv[]) {
   signal(SIGINT, sighandler);
   signal(SIGPIPE, sighandler);
 
-  printf("What difficulty mode would you like? Type 1 for easy, 2 for medium, 3 for hard, and 4 for xtreme");
+  printf("What difficulty mode would you like? \nType e for easy (changing 1/4 of the letters)\nm for medium (changing 1/3 of the letters) \nh for hard (strfrying every word) \nand x for xtreme (strfrying the whole thing)");
   char difficulty[16];
   fgets(difficulty, 16, stdin);
-  int difficultyMode = atoi(difficulty);
 
   int numPlayers = atoi(argv[1]);
   int numRounds = numPlayers;
@@ -105,7 +117,7 @@ int main(int argc, char * argv[]) {
           //write finalSentence to file, execvp
           int randSent = (int) rand() % 6;
           strcpy(sentence, extraSentences[randSent]);
-          editSentence(sentence, difficultyMode);
+          editSentence(sentence, difficulty);
         }
         else {
           read(fdsToParent[i][READ], sentence, 64);
@@ -146,7 +158,7 @@ int main(int argc, char * argv[]) {
                 write(fdsToParent[i][WRITE], sent, sizeof(sent));
               }
               else {
-                editSentence(sent, difficultyMode);
+                editSentence(sent, difficulty);
                 printf("Edited sentence: %s\n", sent);
                 write(fdsToParent[i][WRITE], sent, sizeof(sent));
                 read(fds[i][READ], sentFromPar, 64);
