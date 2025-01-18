@@ -10,13 +10,25 @@ static void sighandler(int signo) {
   }
 }
 
+void anagram(char * original) {
+
+}
+
 int editSentence(char * original, char * mode) {
   if (mode[0] == 'x') {
-    strfry(original);
+    anagram(original);
     return 0;
   }
   if (mode[0] == 'h') {
-    strfry(original);
+    char new[64];
+    while (strlen(original)) {
+      char * token;
+      token = strsep(& original, " ");
+      anagram(token);
+      strcat(new, token);
+      strcat(new, " ");
+    }
+    strcpy(original, new);
     return 0;
   }
   int len = strlen(original);
