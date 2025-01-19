@@ -6,7 +6,6 @@ static void sighandler(int signo) {
     exit(0);
   }
   if (signo == SIGPIPE) {
-    //printf("In sigpipe\n");
   }
 }
 
@@ -102,7 +101,6 @@ int main(int argc, char * argv[]) {
   if (p) {
     char line[16] = "ready";
     for (int i = 0; i < numPlayers; i++) {
-      //printf("childPids i: %d\n", childPids[i]);
       close(fds[i][READ]);
       write(fds[i][WRITE], line, sizeof(line));
       close(fdsToParent[i][WRITE]);
@@ -148,43 +146,37 @@ int main(int argc, char * argv[]) {
       //printf("hey\n");
       if (getpid() == childPids[i]) {
         char line[16];
-        char ready[16] = "ready";
         close(fds[i][WRITE]);
         read(fds[i][READ], line, sizeof(line));
-        if (! strcmp(line, ready)) {
-          char numRoundsStr[16];
-          sprintf(numRoundsStr, "%d", numRounds);
-          write(to_client, numRoundsStr, 16);
-          for (int currRound = 0; currRound < numRounds; currRound++) {
-            char sent[64] = "";
-            char sentFromPar[64] = "";
-            if (currRound != 0 && currRound % numPlayers == 0) {
-              char randomSent[64] = "";
-              read(fds[i][READ], randomSent, 64);
-              write(to_client, randomSent, sizeof(randomSent));
-            }
-            read(from_client, sent, 64);
-            printf("Received sentence: %s\n", sent);
-            if (currRound < numRounds - 1) {
-              if (currRound % numPlayers == numPlayers - 1) {
-                write(fdsToParent[i][WRITE], sent, sizeof(sent));
-              }
-              else {
-                editSentence(sent, difficulty);
-                printf("Edited sentence: %s\n", sent);
-                write(fdsToParent[i][WRITE], sent, sizeof(sent));
-                read(fds[i][READ], sentFromPar, 64);
-                write(to_client, sentFromPar, sizeof(sentFromPar));
-              }
+        char numRoundsStr[16];
+        sprintf(numRoundsStr, "%d", numRounds);
+        write(to_client, numRoundsStr, 16);
+        for (int currRound = 0; currRound < numRounds; currRound++) {
+          char sent[64] = "";
+          char sentFromPar[64] = "";
+          if (currRound != 0 && currRound % numPlayers == 0) {
+            char randomSent[64] = "";
+            read(fds[i][READ], randomSent, 64);
+            write(to_client, randomSent, sizeof(randomSent));
+          }
+          read(from_client, sent, 64);
+          printf("Received sentence: %s\n", sent);
+          if (currRound < numRounds - 1) {
+            if (currRound % numPlayers == numPlayers - 1) {
+              write(fdsToParent[i][WRITE], sent, sizeof(sent));
             }
             else {
-              printf("Final sentence: %s\n", sent);
-              //execvp
+              editSentence(sent, difficulty);
+              printf("Edited sentence: %s\n", sent);
+              write(fdsToParent[i][WRITE], sent, sizeof(sent));
+              read(fds[i][READ], sentFromPar, 64);
+              write(to_client, sentFromPar, sizeof(sentFromPar));
             }
           }
-        }
-        else {
-          printf("There is a bug with the code saying the game is ready to begin.\n");
+          else {
+            printf("Final sentence: %s\n", sent);
+            //execvp
+          }
         }
       }
     }
