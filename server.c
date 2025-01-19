@@ -20,12 +20,14 @@ int editSentence(char * original, char * mode) {
   }
   if (mode[0] == 'h') {
     char new[64];
+    char space[2] = " ";
     while (strlen(original)) {
       char * token;
-      token = strsep(& original, " ");
+      char * curr = original;
+      token = strsep(& curr, " ");
       anagram(token);
       strcat(new, token);
-      strcat(new, " ");
+      strcat(new, space);
     }
     strcpy(original, new);
     return 0;
