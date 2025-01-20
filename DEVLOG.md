@@ -30,3 +30,6 @@ I spent a lot of time writing and then deleting different versions of numRounds,
 
 ### 2025-1-16 - Can't play on temp?
 In class I worked on numRounds again. The first of the two broken parts is fixed, but it still ends one round early weirdly. But in class and in the dojo I ran into an annoying problem. Due to either premission issues or pipe limitations, I couldn't play with somebody else who ssh'ed into temp.
+
+### 2025-1-17,18,19 - Permission, numRounds fixed
+It now works by sshing and using /tmp. Additionally, you can play any number of rounds. I could switch that into 2 different modes. I also got work done on difficulties.
