@@ -69,7 +69,7 @@ int main(int argc, char * argv[]) {
     numRounds = atoi(argv[2]);
   }
 
-  printf("numRounds: %d, numPlayers: %d\n", numRounds, numPlayers);
+  shmget(key, sizeof(int), IPC_CREAT | 0666);
 
   int to_client;
   int from_client;
@@ -147,6 +147,8 @@ int main(int argc, char * argv[]) {
         write(fds[j][WRITE], sentence, sizeof(sentence));
       }
     }
+    int shm = shmget(key, 0, 0);
+    shmctl(shm, IPC_RMID, 0);
   }
   else {
     for (int i = 0; i < numPlayers; i++) {
