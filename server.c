@@ -9,27 +9,22 @@ static void sighandler(int signo) {
   }
 }
 
-void anagram(char * original) {
-  for (int i = 0; i < strlen(original); i++) {
-    original[i] = 'a';
-  }
-}
-
 int editSentence(char * original, char * mode) {
+  int len = strlen(original) - 1;
   if (mode[0] == 'x') {
-    anagram(original);
+    original[len] = ' ';
+    strfry(original);
     return 0;
   }
-  int len = strlen(original) - 1;
-  printf("Len: %d\n", len);
   if (mode[0] == 'h') {
     original[len] = ' ';
     char new[64] = "";
     char space[2] = " ";
     char * curr = original;
-    printf("Original: %s\n", original);
-    printf("Original 2: %s\n", original);
-    printf("Curr: %s\n", curr);
+    curr[len] = ' ';
+//    printf("Original: %s\n", original);
+//    printf("Original 2: %s\n", original);
+//    printf("Curr: %s\n", curr);
     int i = 0;
     while (strlen(curr)) {
       if (i > 0) {
@@ -37,16 +32,16 @@ int editSentence(char * original, char * mode) {
       }
       char * token;
       token = strsep(& curr, " ");
-      anagram(token);
+      strfry(token);
       strcat(new, token);
-      printf("Token: %s, New: %s, Curr: %s, Currlen: %ld\n", token, new, curr, strlen(curr));
+//      printf("Token: %s, New: %s, Curr: %s, Currlen: %ld\n", token, new, curr, strlen(curr));
       i++;
     }
-    printf("Original 3: %s\n", original);
-    printf("Len: %d\n", len);
+//    printf("Original 3: %s\n", original);
+//    printf("Len: %d\n", len);
     for (int i = 0; i < len; i++) {
       original[i] = new[i];
-      printf("Original: %s\n", original);
+//      printf("Original: %s\n", original);
     }
     return 0;
   }
