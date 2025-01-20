@@ -6,32 +6,38 @@ static void sighandler(int signo) {
     exit(0);
   }
   if (signo == SIGPIPE) {
-    //printf("In sigpipe\n");
   }
-}
-
-void anagram(char * original) {
-
 }
 
 int editSentence(char * original, char * mode) {
+  int len = strlen(original) - 1;
   if (mode[0] == 'x') {
-    anagram(original);
+    original = strsep(& original, "\n");
+    strfry(original);
     return 0;
   }
   if (mode[0] == 'h') {
-    char new[64];
-    while (strlen(original)) {
+    original = strsep(& original, "\n");
+    char new[128] = "";
+    char space[2] = " ";
+    char * curr = original;
+    curr[len] = ' ';
+    int i = 0;
+    while (strlen(curr)) {
+      if (i > 0) {
+        strcat(new, space);
+      }
       char * token;
-      token = strsep(& original, " ");
-      anagram(token);
+      token = strsep(& curr, " ");
+      strfry(token);
       strcat(new, token);
-      strcat(new, " ");
+      i++;
     }
-    strcpy(original, new);
+    for (int i = 0; i < len; i++) {
+      original[i] = new[i];
+    }
     return 0;
   }
-  int len = strlen(original);
   int numLets = len / 3;
   if (mode[0] == 'e') {
     numLets = len / 4;
@@ -53,7 +59,7 @@ int main(int argc, char * argv[]) {
   signal(SIGINT, sighandler);
   signal(SIGPIPE, sighandler);
 
-  printf("What difficulty mode would you like? \nType e for easy (changing 1/4 of the letters)\nm for medium (changing 1/3 of the letters) \nh for hard (strfrying every word) \nand x for xtreme (strfrying the whole thing)");
+  printf("What difficulty mode would you like? \nType e for easy (changing 1/4 of the letters)\nm for medium (changing 1/3 of the letters) \nh for hard (strfrying every word) \nand x for xtreme (strfrying the whole thing)\n");
   char difficulty[16];
   fgets(difficulty, 16, stdin);
 
@@ -80,7 +86,7 @@ int main(int argc, char * argv[]) {
     pipe(fdsToParent[i]);
   }
 
-  char * extraSentences[64] = {"abcdefg", "hijklmnop", "qrstuv", "wxyz", "123456", "7890"};
+  char * extraSentences[64] = {"abcdefg\n", "hijklmnop\n", "qrstuv\n", "wxyz\n", "123456\n", "7890\n"};
 
   while (players < numPlayers) {
     from_client = server_setup();
@@ -102,15 +108,14 @@ int main(int argc, char * argv[]) {
   if (p) {
     char line[16] = "ready";
     for (int i = 0; i < numPlayers; i++) {
-      //printf("childPids i: %d\n", childPids[i]);
       close(fds[i][READ]);
       write(fds[i][WRITE], line, sizeof(line));
       close(fdsToParent[i][WRITE]);
     }
     for (int currRound = 0; currRound < numPlayers - 1; currRound++) {
       for (int i = 0; i < numPlayers; i++) {
-        char sentence[64] = "";
-        read(fdsToParent[i][READ], sentence, 64);
+        char sentence[128] = "";
+        read(fdsToParent[i][READ], sentence, 128);
         int j = i+1;
         if (j == numPlayers) {
           j = 0;
@@ -121,10 +126,10 @@ int main(int argc, char * argv[]) {
     }
     for (int currRound = numPlayers; currRound < numRounds; currRound++) {
       for (int i = 0; i < numPlayers; i++) {
-        char sentence[64] = "";
+        char sentence[128] = "";
         if (currRound % numPlayers == 0) {
-          char finalSentence[64] = "";
-          read(fdsToParent[i][READ], finalSentence, 64);
+          char finalSentence[128] = "";
+          read(fdsToParent[i][READ], finalSentence, 128);
           printf("Final sentence (in parent): %s\n", finalSentence);
           //write finalSentence to file, execvp
           int randSent = (int) rand() % 6;
@@ -132,7 +137,7 @@ int main(int argc, char * argv[]) {
           editSentence(sentence, difficulty);
         }
         else {
-          read(fdsToParent[i][READ], sentence, 64);
+          read(fdsToParent[i][READ], sentence, 128);
         }
         int j = i+1;
         if (j == numPlayers) {
@@ -148,54 +153,41 @@ int main(int argc, char * argv[]) {
       //printf("hey\n");
       if (getpid() == childPids[i]) {
         char line[16];
-        char ready[16] = "ready";
         close(fds[i][WRITE]);
         read(fds[i][READ], line, sizeof(line));
-        if (! strcmp(line, ready)) {
-          char numRoundsStr[16];
-          sprintf(numRoundsStr, "%d", numRounds);
-          write(to_client, numRoundsStr, 16);
-          for (int currRound = 0; currRound < numRounds; currRound++) {
-            char sent[64] = "";
-            char sentFromPar[64] = "";
-            if (currRound != 0 && currRound % numPlayers == 0) {
-              char randomSent[64] = "";
-              read(fds[i][READ], randomSent, 64);
-              write(to_client, randomSent, sizeof(randomSent));
-            }
-            read(from_client, sent, 64);
-            printf("Received sentence: %s\n", sent);
-            if (currRound < numRounds - 1) {
-              if (currRound % numPlayers == numPlayers - 1) {
-                write(fdsToParent[i][WRITE], sent, sizeof(sent));
-              }
-              else {
-                editSentence(sent, difficulty);
-                printf("Edited sentence: %s\n", sent);
-                write(fdsToParent[i][WRITE], sent, sizeof(sent));
-                read(fds[i][READ], sentFromPar, 64);
-                write(to_client, sentFromPar, sizeof(sentFromPar));
-              }
+        char numRoundsStr[16];
+        sprintf(numRoundsStr, "%d", numRounds);
+        write(to_client, numRoundsStr, 16);
+        for (int currRound = 0; currRound < numRounds; currRound++) {
+          char sent[128] = "";
+          char sentFromPar[128] = "";
+          if (currRound != 0 && currRound % numPlayers == 0) {
+            char randomSent[128] = "";
+            read(fds[i][READ], randomSent, 128);
+            write(to_client, randomSent, sizeof(randomSent));
+          }
+          read(from_client, sent, 128);
+          printf("Received sentence: %s\n", sent);
+          if (currRound < numRounds - 1) {
+            if (currRound % numPlayers == numPlayers - 1) {
+              write(fdsToParent[i][WRITE], sent, sizeof(sent));
             }
             else {
-              printf("Final sentence: %s\n", sent);
-              //execvp
+              editSentence(sent, difficulty);
+              printf("Edited sentence: %s\n", sent);
+              write(fdsToParent[i][WRITE], sent, sizeof(sent));
+              read(fds[i][READ], sentFromPar, 128);
+              write(to_client, sentFromPar, sizeof(sentFromPar));
             }
           }
-        }
-        else {
-          printf("There is a bug with the code saying the game is ready to begin.\n");
+          else {
+            printf("Final sentence: %s\n", sent);
+            //execvp
+          }
         }
       }
     }
   }
-
-
-
-
-
-
-
 
 
 
