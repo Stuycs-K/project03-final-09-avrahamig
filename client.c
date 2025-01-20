@@ -32,8 +32,8 @@ int main() {
     char rec[128] = "";
     char sent[128] = "";
     read(from_server, rec, 128);
-    int shm = shmget(key, sizeof(int), 0);
-    int * diff = shmat(shm, 0, 0);
+    int shm = shmget(KEY, 16, 0);
+    char * diff = shmat(shm, 0, 0);
     shmdt(diff);
     printf("Here is the sentence you received: %s\nWhat do you think it was supposed to say? (Reminder, difficulty is %s). Enter below:\n", rec, diff);
     fgets(sent, 128, stdin);

@@ -63,10 +63,10 @@ int main(int argc, char * argv[]) {
   char difficulty[16];
   fgets(difficulty, 16, stdin);
 
-  shmget(key, sizeof(int), IPC_CREAT | 0666);  
-  char shm[64] = shmget(key, 64, 0);
+  shmget(KEY, 16, IPC_CREAT | 0666);
+  int shm = shmget(KEY, 16, 0);
   char * diff = shmat(shm, 0, 0);
-  * diff = difficulty;
+  strcpy(diff, difficulty);
 
   int numPlayers = atoi(argv[1]);
   int numRounds = numPlayers;
@@ -150,7 +150,7 @@ int main(int argc, char * argv[]) {
         write(fds[j][WRITE], sentence, sizeof(sentence));
       }
     }
-    char shm[64] = shmget(key, 0, 0);
+    int shm = shmget(KEY, 0, 0);
     shmctl(shm, IPC_RMID, 0);
   }
   else {
