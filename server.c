@@ -10,7 +10,9 @@ static void sighandler(int signo) {
 }
 
 void anagram(char * original) {
-
+  for (int i = 0; i < strlen(original); i++) {
+    original[i] = 'a';
+  }
 }
 
 int editSentence(char * original, char * mode) {
@@ -21,12 +23,15 @@ int editSentence(char * original, char * mode) {
   int len = strlen(original) - 1;
   printf("Len: %d\n", len);
   if (mode[0] == 'h') {
+    original[len] = ' ';
     char new[64] = "";
     char space[2] = " ";
     char * curr = original;
+    printf("Original: %s\n", original);
+    printf("Original 2: %s\n", original);
     printf("Curr: %s\n", curr);
     int i = 0;
-    while (curr) {
+    while (strlen(curr)) {
       if (i > 0) {
         strcat(new, space);
       }
@@ -34,9 +39,10 @@ int editSentence(char * original, char * mode) {
       token = strsep(& curr, " ");
       anagram(token);
       strcat(new, token);
-      printf("New: %s, Currlen: %ld\n", new, strlen(curr));
+      printf("Token: %s, New: %s, Curr: %s, Currlen: %ld\n", token, new, curr, strlen(curr));
       i++;
     }
+    printf("Original 3: %s\n", original);
     printf("Len: %d\n", len);
     for (int i = 0; i < len; i++) {
       original[i] = new[i];
