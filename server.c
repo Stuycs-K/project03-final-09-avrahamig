@@ -18,7 +18,7 @@ int editSentence(char * original, char * mode) {
     anagram(original);
     return 0;
   }
-  int len = strlen(original);
+  int len = strlen(original) - 1;
   printf("Len: %d\n", len);
   if (mode[0] == 'h') {
     char new[64] = "";
@@ -26,7 +26,7 @@ int editSentence(char * original, char * mode) {
     char * curr = original;
     printf("Curr: %s\n", curr);
     int i = 0;
-    while (curr[0] != 0) {
+    while (curr) {
       if (i > 0) {
         strcat(new, space);
       }
@@ -34,7 +34,7 @@ int editSentence(char * original, char * mode) {
       token = strsep(& curr, " ");
       anagram(token);
       strcat(new, token);
-      printf("New: %s, Currlen: %d\n", new, strlen(curr));
+      printf("New: %s, Currlen: %ld\n", new, strlen(curr));
       i++;
     }
     printf("Len: %d\n", len);
@@ -65,7 +65,7 @@ int main(int argc, char * argv[]) {
   signal(SIGINT, sighandler);
   signal(SIGPIPE, sighandler);
 
-  printf("What difficulty mode would you like? \nType e for easy (changing 1/4 of the letters)\nm for medium (changing 1/3 of the letters) \nh for hard (strfrying every word) \nand x for xtreme (strfrying the whole thing)");
+  printf("What difficulty mode would you like? \nType e for easy (changing 1/4 of the letters)\nm for medium (changing 1/3 of the letters) \nh for hard (strfrying every word) \nand x for xtreme (strfrying the whole thing)\n");
   char difficulty[16];
   fgets(difficulty, 16, stdin);
 
