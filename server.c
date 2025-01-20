@@ -18,21 +18,32 @@ int editSentence(char * original, char * mode) {
     anagram(original);
     return 0;
   }
+  int len = strlen(original);
+  printf("Len: %d\n", len);
   if (mode[0] == 'h') {
-    char new[64];
+    char new[64] = "";
     char space[2] = " ";
     char * curr = original;
-    while (strlen(curr)) {
+    printf("Curr: %s\n", curr);
+    int i = 0;
+    while (curr[0] != 0) {
+      if (i > 0) {
+        strcat(new, space);
+      }
       char * token;
       token = strsep(& curr, " ");
       anagram(token);
       strcat(new, token);
-      strcat(new, space);
+      printf("New: %s, Currlen: %d\n", new, strlen(curr));
+      i++;
     }
-    strcpy(original, new);
+    printf("Len: %d\n", len);
+    for (int i = 0; i < len; i++) {
+      original[i] = new[i];
+      printf("Original: %s\n", original);
+    }
     return 0;
   }
-  int len = strlen(original);
   int numLets = len / 3;
   if (mode[0] == 'e') {
     numLets = len / 4;
