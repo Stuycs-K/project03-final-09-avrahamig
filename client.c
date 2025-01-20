@@ -23,17 +23,17 @@ int main() {
   int numRounds = atoi(numRoundsStr);
   printf("The game of telephone has begun! Enter your sentence below:\n");
 
-  char sentence[64];
+  char sentence[128];
 
-  fgets(sentence, 64, stdin);
+  fgets(sentence, 128, stdin);
   write(to_server, sentence, sizeof(sentence));
 
   for (int i = 0; i < numRounds - 1; i++) {
-    char rec[64] = "";
-    char sent[64] = "";
-    read(from_server, rec, 64);
+    char rec[128] = "";
+    char sent[128] = "";
+    read(from_server, rec, 128);
     printf("Here is the sentence you received: %s\nWhat do you think it was supposed to say? Enter below:\n", rec);
-    fgets(sent, 64, stdin);
+    fgets(sent, 128, stdin);
     write(to_server, sent, sizeof(sent));
   }
 }

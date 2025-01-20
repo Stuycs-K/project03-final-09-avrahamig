@@ -18,13 +18,10 @@ int editSentence(char * original, char * mode) {
   }
   if (mode[0] == 'h') {
     original = strsep(& original, "\n");
-    char new[64] = "";
+    char new[128] = "";
     char space[2] = " ";
     char * curr = original;
     curr[len] = ' ';
-//    printf("Original: %s\n", original);
-//    printf("Original 2: %s\n", original);
-//    printf("Curr: %s\n", curr);
     int i = 0;
     while (strlen(curr)) {
       if (i > 0) {
@@ -34,14 +31,10 @@ int editSentence(char * original, char * mode) {
       token = strsep(& curr, " ");
       strfry(token);
       strcat(new, token);
-//      printf("Token: %s, New: %s, Curr: %s, Currlen: %ld\n", token, new, curr, strlen(curr));
       i++;
     }
-//    printf("Original 3: %s\n", original);
-//    printf("Len: %d\n", len);
     for (int i = 0; i < len; i++) {
       original[i] = new[i];
-//      printf("Original: %s\n", original);
     }
     return 0;
   }
@@ -93,7 +86,7 @@ int main(int argc, char * argv[]) {
     pipe(fdsToParent[i]);
   }
 
-  char * extraSentences[64] = {"abcdefg", "hijklmnop", "qrstuv", "wxyz", "123456", "7890"};
+  char * extraSentences[64] = {"abcdefg\n", "hijklmnop\n", "qrstuv\n", "wxyz\n", "123456\n", "7890\n"};
 
   while (players < numPlayers) {
     from_client = server_setup();
@@ -121,8 +114,8 @@ int main(int argc, char * argv[]) {
     }
     for (int currRound = 0; currRound < numPlayers - 1; currRound++) {
       for (int i = 0; i < numPlayers; i++) {
-        char sentence[64] = "";
-        read(fdsToParent[i][READ], sentence, 64);
+        char sentence[128] = "";
+        read(fdsToParent[i][READ], sentence, 128);
         int j = i+1;
         if (j == numPlayers) {
           j = 0;
@@ -133,10 +126,10 @@ int main(int argc, char * argv[]) {
     }
     for (int currRound = numPlayers; currRound < numRounds; currRound++) {
       for (int i = 0; i < numPlayers; i++) {
-        char sentence[64] = "";
+        char sentence[128] = "";
         if (currRound % numPlayers == 0) {
-          char finalSentence[64] = "";
-          read(fdsToParent[i][READ], finalSentence, 64);
+          char finalSentence[128] = "";
+          read(fdsToParent[i][READ], finalSentence, 128);
           printf("Final sentence (in parent): %s\n", finalSentence);
           //write finalSentence to file, execvp
           int randSent = (int) rand() % 6;
@@ -144,7 +137,7 @@ int main(int argc, char * argv[]) {
           editSentence(sentence, difficulty);
         }
         else {
-          read(fdsToParent[i][READ], sentence, 64);
+          read(fdsToParent[i][READ], sentence, 128);
         }
         int j = i+1;
         if (j == numPlayers) {
@@ -166,14 +159,14 @@ int main(int argc, char * argv[]) {
         sprintf(numRoundsStr, "%d", numRounds);
         write(to_client, numRoundsStr, 16);
         for (int currRound = 0; currRound < numRounds; currRound++) {
-          char sent[64] = "";
-          char sentFromPar[64] = "";
+          char sent[128] = "";
+          char sentFromPar[128] = "";
           if (currRound != 0 && currRound % numPlayers == 0) {
-            char randomSent[64] = "";
-            read(fds[i][READ], randomSent, 64);
+            char randomSent[128] = "";
+            read(fds[i][READ], randomSent, 128);
             write(to_client, randomSent, sizeof(randomSent));
           }
-          read(from_client, sent, 64);
+          read(from_client, sent, 128);
           printf("Received sentence: %s\n", sent);
           if (currRound < numRounds - 1) {
             if (currRound % numPlayers == numPlayers - 1) {
@@ -183,7 +176,7 @@ int main(int argc, char * argv[]) {
               editSentence(sent, difficulty);
               printf("Edited sentence: %s\n", sent);
               write(fdsToParent[i][WRITE], sent, sizeof(sent));
-              read(fds[i][READ], sentFromPar, 64);
+              read(fds[i][READ], sentFromPar, 128);
               write(to_client, sentFromPar, sizeof(sentFromPar));
             }
           }
@@ -195,13 +188,6 @@ int main(int argc, char * argv[]) {
       }
     }
   }
-
-
-
-
-
-
-
 
 
 
