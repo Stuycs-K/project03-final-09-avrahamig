@@ -21,9 +21,9 @@ int editSentence(char * original, char * mode) {
   if (mode[0] == 'h') {
     char new[64];
     char space[2] = " ";
-    while (strlen(original)) {
+    char * curr = original;
+    while (strlen(curr)) {
       char * token;
-      char * curr = original;
       token = strsep(& curr, " ");
       anagram(token);
       strcat(new, token);
