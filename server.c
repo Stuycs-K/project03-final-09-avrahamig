@@ -12,22 +12,12 @@ static void sighandler(int signo) {
 int editSentence(char * original, char * mode) {
   int len = strlen(original) - 1;
   if (mode[0] == 'x') {
-    if (strchr(original, ' ')) {
-      original[len] = ' ';
-    }
-    else {
-      original = strsep(& original, "\n");
-    }
+    original = strsep(& original, "\n");
     strfry(original);
     return 0;
   }
   if (mode[0] == 'h') {
-    if (strchr(original, ' ')) {
-      original[len] = ' ';
-    }
-    else {
-      original = strsep(& original, "\n");
-    }
+    original = strsep(& original, "\n");
     char new[64] = "";
     char space[2] = " ";
     char * curr = original;
