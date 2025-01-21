@@ -70,7 +70,7 @@ int reset(int i, int numPlayers) {
   return j;
 }
 
-void transition(int numPlayers, int currRound, int * * changed, int story, int * * fds, int * * fdsToParent, int doIt) {
+void transition(int numPlayers, int currRound, int * * changed, int story, int (* fds)[2], int (* fdsToParent)[2], int difficulty, int doIt) {
   char opener[32];
   sprintf(opener, "\n\n\nRound %d:\n\n", currRound+1);
   write(story, opener, strlen(opener));
@@ -83,7 +83,7 @@ void transition(int numPlayers, int currRound, int * * changed, int story, int *
       printf("Final sentence (in parent): %s\n", finalSentence);
 
       char * extraSentences[64] = {"abcdefg\n", "hijklmnop\n", "qrstuv\n", "wxyz\n", "123456\n", "7890\n"};
-      
+
       char end[132];
       sprintf(end, "%d: %s\n", i+1, finalSentence);
       write(story, end, strlen(end));
@@ -185,10 +185,10 @@ int main() {
       close(fdsToParent[i][WRITE]);
     }
     for (int currRound = 0; currRound < numPlayers - 1; currRound++) {
-      transition(numPlayers, currRound, changed, story, fds, fdsToParent, 0);
+      transition(numPlayers, currRound, changed, story, fds, fdsToParent, difficulty, 0);
     }
     for (int currRound = numPlayers; currRound < numRounds; currRound++) {
-      transition(numPlayers, currRound, changed, story, fds, fdsToParent 1);
+      transition(numPlayers, currRound, changed, story, fds, fdsToParent, difficulty, 1);
     }
     for (int i = 0; i < numPlayers; i++) {
       shmdt(changed[i]);
