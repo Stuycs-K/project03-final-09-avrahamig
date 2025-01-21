@@ -159,6 +159,11 @@ int main() {
         int j = reset(i, numPlayers);
         char sentence[128] = "";
         read(fdsToParent[i][READ], sentence, 128);
+        int letsChanged = editSentence(sentence, difficulty);
+        if (! (difficulty == 'x' || difficulty == 'h')) {
+          int j = reset(i, numPlayers);
+          * changed[j] = letsChanged;
+        }
         printf("Parent received sentence: %s\n", sentence);
         char middler[132];
         sprintf(middler, "%d: %s\n", i+1, sentence);
@@ -183,13 +188,14 @@ int main() {
           write(story, end, strlen(end));
           int randSent = (int) rand() % 6;
           strcpy(sentence, extraSentences[randSent]);
-          int letsChanged = editSentence(sentence, difficulty);
-          if (! (difficulty == 'x' || difficulty == 'h')) {
-            * changed[j] = letsChanged;
-          }
         }
         else {
           read(fdsToParent[i][READ], sentence, 128);
+        }
+        int letsChanged = editSentence(sentence, difficulty);
+        if (! (difficulty == 'x' || difficulty == 'h')) {
+          int j = reset(i, numPlayers);
+          * changed[j] = letsChanged;
         }
         printf("Parent received sentence: %s\n", sentence);
         char middler[132];
@@ -227,25 +233,17 @@ int main() {
           read(from_client, sent, 128);
           printf("Received sentence: %s\n", sent);
           if (currRound < numRounds - 1) {
-            if (currRound % numPlayers == numPlayers - 1) {
-              write(fdsToParent[i][WRITE], sent, sizeof(sent));
-            }
-            else {
-              int letsChanged = editSentence(sent, difficulty);
-              if (! (difficulty == 'x' || difficulty == 'h')) {
-                int j = reset(i, numPlayers);
-                * changed[j] = letsChanged;
-              }
-              printf("Edited sentence: %s\n", sent);
-              write(fdsToParent[i][WRITE], sent, sizeof(sent));
+            write(fdsToParent[i][WRITE], sent, sizeof(sent));
+            if (currRound % numPlayers != numPlayers - 1) {
+             // printf("Edited sentence: %s\n", sent);
               read(fds[i][READ], sentFromPar, 128);
               write(to_client, sentFromPar, sizeof(sentFromPar));
             }
           }
           else {
             printf("Final sentence: %s\n", sent);
-            char finaler[132];
-            sprintf(finaler, "END %d: %s\n", i, sent);
+            char finaler[148];
+            sprintf(finaler, "\n\nEND %d: %s", i, sent);
             write(story, finaler, strlen(finaler));
           }
         }
