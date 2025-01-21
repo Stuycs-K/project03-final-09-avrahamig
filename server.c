@@ -74,29 +74,42 @@ void transition(int numPlayers, int currRound, int * * changed, int story, int (
   char opener[32];
   sprintf(opener, "\n\n\nRound %d:\n\n", currRound+1);
   write(story, opener, strlen(opener));
-  for (int i = 0; i < numPlayers; i++) {
-    char sentence[128] = "";
-    int j = reset(i, numPlayers);
-    if (doIt && currRound % numPlayers == 0) {
-      char * extraSentences[64] = {"abcdefg\n", "hijklmnop\n", "qrstuv\n", "wxyz\n", "123456\n", "7890\n"};
-      int randSent = (int) rand() % 6;
-      strcpy(sentence, extraSentences[randSent]);
-    }
-    else {
-      read(fdsToParent[i][READ], sentence, 128);
-    }
-    char middler[132];
-    sprintf(middler, "%d: %s->\n", i+1, sentence);
-    write(story, middler, strlen(middler));
-    int letsChanged = editSentence(sentence, difficulty);
-    if (! (difficulty == 'x' || difficulty == 'h')) {
-      * changed[j] = letsChanged;
-    }
-    printf("Parent received sentence: %s\n", sentence);
-    char middler2[132];
-    sprintf(middler2, "%d: %s\n", i+1, sentence);
-    write(story, middler2, strlen(middler2));
-    write(fds[j][WRITE], sentence, sizeof(sentence));
+//  if (currRound != numPlayers-1) {
+    for (int i = 0; i < numPlayers; i++) {
+printf("hi1\n");
+      char sentence[128] = "";
+      int j = reset(i, numPlayers);
+printf("hi2\n");
+      if (doIt && currRound % numPlayers == 0) {
+        char done[16] = "";
+        read(fdsToParent[i][READ], done, 16);
+        char * extraSentences[64] = {"abcdefg\n", "hijklmnop\n", "qrstuv\n", "wxyz\n", "123456\n", "7890\n"};
+printf("hi3\n");
+        int randSent = (int) rand() % 6;
+        strcpy(sentence, extraSentences[randSent]);
+      }
+      else {
+        read(fdsToParent[i][READ], sentence, 128);
+      }
+      char middler[148];
+printf("hi4\n");
+      sprintf(middler, "%d: %s->\n", i+1, sentence);
+      write(story, middler, strlen(middler));
+      int letsChanged = editSentence(sentence, difficulty);
+printf("hi5\n");
+      if (! (difficulty == 'x' || difficulty == 'h')) {
+printf("hi6\n");
+        * changed[j] = letsChanged;
+      }
+      printf("Parent received sentence: %s\n", sentence);
+printf("hi7\n");
+      char middler2[148];
+      sprintf(middler2, "%d: %s\n", i+1, sentence);
+printf("hi8\n");
+      write(story, middler2, strlen(middler2));
+printf("hi9\n");
+      write(fds[j][WRITE], sentence, sizeof(sentence));
+//    }
   }
 }
 
@@ -214,15 +227,17 @@ int main() {
           read(from_client, sent, 128);
           printf("Received sentence: %s\n", sent);
           if (currRound % numPlayers == numPlayers - 1) {
-            write(fdsToParent[i][WRITE], sent, sizeof(sent));
-            read(fds[i][READ], sentFromPar, 128);
-            write(to_client, sentFromPar, sizeof(sentFromPar));
-          }
-          else {
             printf("Final sentence: %s\n", sent);
             char finaler[148];
             sprintf(finaler, "\n\nEND %d: %s", i, sent);
             write(story, finaler, strlen(finaler));
+            char done[16] = "done";
+            write(fdsToParent[i][WRITE], done, sizeof(done));
+          }
+          else {
+            write(fdsToParent[i][WRITE], sent, sizeof(sent));
+            read(fds[i][READ], sentFromPar, 128);
+            write(to_client, sentFromPar, sizeof(sentFromPar));
           }
         }
       }
