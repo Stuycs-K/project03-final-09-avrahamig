@@ -113,10 +113,6 @@ int main() {
   int players = 0;
   int childPids[numPlayers];
 
-  char opener[32] = "\n\n\nRound ";
-  char middler[132];
-  char currRoundStr[16];
-
   int p;
 
   int fds[numPlayers][2];
@@ -156,22 +152,23 @@ int main() {
       close(fdsToParent[i][WRITE]);
     }
     for (int currRound = 0; currRound < numPlayers - 1; currRound++) {
-      sprintf(currRoundStr, "%d:\n\n", currRound+1);
-      strcat(opener, currRoundStr);
+      char opener[32];
+      sprintf(opener, "\n\n\nRound %d:\n\n", currRound+1);
       write(story, opener, strlen(opener));
       for (int i = 0; i < numPlayers; i++) {
         int j = reset(i, numPlayers);
         char sentence[128] = "";
         read(fdsToParent[i][READ], sentence, 128);
         printf("Parent received sentence: %s\n", sentence);
+        char middler[132];
         sprintf(middler, "%d: %s\n", i+1, sentence);
         write(story, middler, strlen(middler));
         write(fds[j][WRITE], sentence, sizeof(sentence));
       }
     }
     for (int currRound = numPlayers; currRound < numRounds; currRound++) {
-      sprintf(currRoundStr, "%d", currRound+1);
-      strcat(opener, currRoundStr);
+      char opener[32];
+      sprintf(opener, "\n\n\nRound %d:\n\n", currRound+1);
       write(story, opener, strlen(opener));
       for (int i = 0; i < numPlayers; i++) {
         char sentence[128] = "";
@@ -195,6 +192,7 @@ int main() {
           read(fdsToParent[i][READ], sentence, 128);
         }
         printf("Parent received sentence: %s\n", sentence);
+        char middler[132];
         sprintf(middler, "%d: %s\n", i+1, sentence);
         write(story, middler, strlen(middler));
         write(fds[j][WRITE], sentence, sizeof(sentence));
