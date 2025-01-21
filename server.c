@@ -78,15 +78,7 @@ void transition(int numPlayers, int currRound, int * * changed, int story, int (
     char sentence[128] = "";
     int j = reset(i, numPlayers);
     if (doIt && currRound % numPlayers == 0) {
-      char finalSentence[128] = "";
-      read(fdsToParent[i][READ], finalSentence, 128);
-      printf("Final sentence (in parent): %s\n", finalSentence);
-
       char * extraSentences[64] = {"abcdefg\n", "hijklmnop\n", "qrstuv\n", "wxyz\n", "123456\n", "7890\n"};
-
-      char end[132];
-      sprintf(end, "%d: %s\n", i+1, finalSentence);
-      write(story, end, strlen(end));
       int randSent = (int) rand() % 6;
       strcpy(sentence, extraSentences[randSent]);
     }
@@ -221,13 +213,10 @@ int main() {
           }
           read(from_client, sent, 128);
           printf("Received sentence: %s\n", sent);
-          if (currRound < numRounds - 1) {
+          if (currRound % numPlayers == numPlayers - 1) {
             write(fdsToParent[i][WRITE], sent, sizeof(sent));
-            if (currRound % numPlayers != numPlayers - 1) {
-             // printf("Edited sentence: %s\n", sent);
-              read(fds[i][READ], sentFromPar, 128);
-              write(to_client, sentFromPar, sizeof(sentFromPar));
-            }
+            read(fds[i][READ], sentFromPar, 128);
+            write(to_client, sentFromPar, sizeof(sentFromPar));
           }
           else {
             printf("Final sentence: %s\n", sent);
