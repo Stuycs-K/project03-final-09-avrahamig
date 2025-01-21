@@ -43,7 +43,12 @@ int main() {
     read(from_server, rec, 128);
     printf("Here is the sentence you received: %s\n", rec);
     if (!(* diff == 'h' || * diff == 'x')) {
-      printf("%d letters were changed\n", * changed);
+      if (* changed == 1) {
+        printf("1 letter was changed\n");
+      }
+      else {
+        printf("%d letters were changed\n", * changed);
+      }
     }
     printf("What do you think it was supposed to say? (Reminder, difficulty is %c). Enter below:\n", * diff);
     fgets(sent, 128, stdin);

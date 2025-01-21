@@ -154,6 +154,7 @@ int main() {
         char sentence[128] = "";
         read(fdsToParent[i][READ], sentence, 128);
         printf("Parent received sentence: %s\n", sentence);
+        write();
         write(fds[j][WRITE], sentence, sizeof(sentence));
       }
     }
