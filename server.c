@@ -211,7 +211,7 @@ int main() {
           read(from_client, sent, 128);
           if (currRound % numPlayers == numPlayers - 1) {
             char finaler[148];
-            sprintf(finaler, "\n\nEND %d: %s", i, sent);
+            sprintf(finaler, "\n\nEND %d: %s", i+1, sent);
             write(story, finaler, strlen(finaler));
             char done[16] = "done";
             write(fdsToParent[i][WRITE], done, sizeof(done));
