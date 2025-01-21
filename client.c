@@ -28,14 +28,15 @@ int main() {
   fgets(sentence, 128, stdin);
   write(to_server, sentence, sizeof(sentence));
 
+  int shm = shmget(KEY, sizeof(char), 0);
+  char * diff = shmat(shm, 0, 0);
+
   for (int i = 0; i < numRounds - 1; i++) {
     char rec[128] = "";
     char sent[128] = "";
     read(from_server, rec, 128);
-    int shm = shmget(KEY, 16, 0);
-    char * diff = shmat(shm, 0, 0);
+    printf("Here is the sentence you received: %s\nWhat do you think it was supposed to say? (Reminder, difficulty is %c). Enter below:\n", rec, * diff);
     shmdt(diff);
-    printf("Here is the sentence you received: %s\nWhat do you think it was supposed to say? (Reminder, difficulty is %s). Enter below:\n", rec, diff);
     fgets(sent, 128, stdin);
     write(to_server, sent, sizeof(sent));
   }

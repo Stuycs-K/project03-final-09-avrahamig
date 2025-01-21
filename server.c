@@ -1,3 +1,4 @@
+
 #include "pipe_networking.h"
 
 static void sighandler(int signo) {
@@ -9,14 +10,14 @@ static void sighandler(int signo) {
   }
 }
 
-int editSentence(char * original, char * mode) {
+int editSentence(char * original, char mode) {
   int len = strlen(original) - 1;
-  if (mode[0] == 'x') {
+  if (mode == 'x') {
     original = strsep(& original, "\n");
     strfry(original);
     return 0;
   }
-  if (mode[0] == 'h') {
+  if (mode == 'h') {
     original = strsep(& original, "\n");
     char new[128] = "";
     char space[2] = " ";
@@ -39,7 +40,7 @@ int editSentence(char * original, char * mode) {
     return 0;
   }
   int numLets = len / 3;
-  if (mode[0] == 'e') {
+  if (mode == 'e') {
     numLets = len / 4;
   }
   for (int i = 0; i < numLets; i++) {
@@ -60,13 +61,15 @@ int main(int argc, char * argv[]) {
   signal(SIGPIPE, sighandler);
 
   printf("What difficulty mode would you like? \nType e for easy (changing 1/4 of the letters)\nm for medium (changing 1/3 of the letters) \nh for hard (strfrying every word) \nand x for xtreme (strfrying the whole thing)\n");
-  char difficulty[16];
-  fgets(difficulty, 16, stdin);
+  char difficultyStr[16];
+  fgets(difficultyStr, 16, stdin);
+  char difficulty = difficultyStr[0];
 
-  shmget(KEY, 16, IPC_CREAT | 0666);
-  int shm = shmget(KEY, 16, 0);
+  int shm = shmget(KEY, sizeof(char), IPC_CREAT | 0666);
   char * diff = shmat(shm, 0, 0);
-  strcpy(diff, difficulty);
+  * diff = difficulty;
+  printf("Diff: %c, Difficulty: %c\n", * diff, difficulty);
+  shmdt(diff);
 
   int numPlayers = atoi(argv[1]);
   int numRounds = numPlayers;
@@ -150,12 +153,10 @@ int main(int argc, char * argv[]) {
         write(fds[j][WRITE], sentence, sizeof(sentence));
       }
     }
-    int shm = shmget(KEY, 0, 0);
     shmctl(shm, IPC_RMID, 0);
   }
   else {
     for (int i = 0; i < numPlayers; i++) {
-      //printf("hey\n");
       if (getpid() == childPids[i]) {
         char line[16];
         close(fds[i][WRITE]);
@@ -193,7 +194,6 @@ int main(int argc, char * argv[]) {
       }
     }
   }
-
 
 
   return 0;
