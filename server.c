@@ -93,14 +93,17 @@ void transition(int numPlayers, int currRound, int * * changed, int story, int (
     else {
       read(fdsToParent[i][READ], sentence, 128);
     }
+    char middler[132];
+    sprintf(middler, "%d: %s->\n", i+1, sentence);
+    write(story, middler, strlen(middler));
     int letsChanged = editSentence(sentence, difficulty);
     if (! (difficulty == 'x' || difficulty == 'h')) {
       * changed[j] = letsChanged;
     }
     printf("Parent received sentence: %s\n", sentence);
-    char middler[132];
-    sprintf(middler, "%d: %s\n", i+1, sentence);
-    write(story, middler, strlen(middler));
+    char middler2[132];
+    sprintf(middler2, "%d: %s\n", i+1, sentence);
+    write(story, middler2, strlen(middler2));
     write(fds[j][WRITE], sentence, sizeof(sentence));
   }
 }
