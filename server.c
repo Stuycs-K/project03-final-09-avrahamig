@@ -73,42 +73,30 @@ void transition(int numPlayers, int currRound, int * * changed, int story, int (
   char opener[32];
   sprintf(opener, "\n\n\nRound %d:\n\n", currRound+1);
   write(story, opener, strlen(opener));
-//  if (currRound != numPlayers-1) {
-    for (int i = 0; i < numPlayers; i++) {
-printf("hi1\n");
-      char sentence[128] = "";
-      int j = reset(i, numPlayers);
-printf("hi2\n");
-      if (doIt && currRound % numPlayers == 0) {
-        char done[16] = "";
-        read(fdsToParent[i][READ], done, 16);
-        char * extraSentences[64] = {"abcdefg\n", "hijklmnop\n", "qrstuv\n", "wxyz\n", "I have to type sentences.\n", "Dr. Seuss wrote The Cat in the Hat.\n", "Running out of ideas.\n", "Pneumonoultramicroscopicsilicovolcanoconiosis.\n", "I am having a good time.\n", "Writing these extra sentences at 2:30 AM.\n", "Life is enjoyable.\n", "This is propaganda.\n", "Whoever reads this, I hope you have a good day.\n", "This sentence was AI-generated.\n", "HELP! I NEED SOMEBODY!\n", "HELP! NOT JUST ANYBODY!\n", "HELP! YOU KNOW I NEED SOMEONE (to write these sentences for me)!\n", "The weather is cloudy.\n", "Banananananananana.\n", "I feel fulfillment writing these.\n", "life is meaningless anyway.\n", "We must fight back against industrial society!\n", "It's like 40 degrees in here help.\n", "How many sentences is this?\n", "I'm eating my sweater right now out of boredom.\n", "zzzzzzzzzzz... sorry, what happened?\n", "3.14159265358979.\n", "To be or not to be.\n", "The yawning maw of existentialism creeps in a steady pace from sentence to sentence.\n", "Whether 'tis nobler to---I'm done w/ Shakespeare.\n", "I hope this was worth it.\n", "I'll never get these 15 minutes back.\n", "Damnit I lost count of how many I've created.\n", "I predict THIS ONE will show up in my demo. Ha I told you.\n", "This is a stock sentence.\n", "This sentence is copyright-protected.\n", "I probably miscounted and this one can't even show up.\n", "Sigh.\n", "Number 39 *maybe*.\n", "Number 40 *probably not*.\n"};
-printf("hi3\n");
-        int randSent = (int) rand() % 40;
-        strcpy(sentence, extraSentences[randSent]);
-      }
-      else {
-        read(fdsToParent[i][READ], sentence, 128);
-      }
-      char middler[148];
-printf("hi4\n");
-      sprintf(middler, "%d: %s->\n", i+1, sentence);
-      write(story, middler, strlen(middler));
-      int letsChanged = editSentence(sentence, difficulty);
-printf("hi5\n");
-      if (! (difficulty == 'x' || difficulty == 'h')) {
-printf("hi6\n");
-        * changed[j] = letsChanged;
-      }
-      printf("Parent received sentence: %s\n", sentence);
-printf("hi7\n");
-      char middler2[148];
-      sprintf(middler2, "%d: %s\n", i+1, sentence);
-printf("hi8\n");
-      write(story, middler2, strlen(middler2));
-printf("hi9\n");
-      write(fds[j][WRITE], sentence, sizeof(sentence));
-//    }
+  for (int i = 0; i < numPlayers; i++) {
+    char sentence[128] = "";
+    int j = reset(i, numPlayers);
+    if (doIt && currRound % numPlayers == 0) {
+      char done[16] = "";
+      read(fdsToParent[i][READ], done, 16);
+      char * extraSentences[64] = {"abcdefg\n", "hijklmnop\n", "qrstuv\n", "wxyz\n", "I have to type sentences.\n", "Dr. Seuss wrote The Cat in the Hat.\n", "Running out of ideas.\n", "Pneumonoultramicroscopicsilicovolcanoconiosis.\n", "I am having a good time.\n", "Writing these extra sentences at 2:30 AM.\n", "Life is enjoyable.\n", "This is propaganda.\n", "Whoever reads this, I hope you have a good day.\n", "This sentence was AI-generated.\n", "HELP! I NEED SOMEBODY!\n", "HELP! NOT JUST ANYBODY!\n", "HELP! YOU KNOW I NEED SOMEONE (to write these sentences for me)!\n", "The weather is cloudy.\n", "Banananananananana.\n", "I feel fulfillment writing these.\n", "life is meaningless anyway.\n", "We must fight back against industrial society!\n", "It's like 40 degrees in here help.\n", "How many sentences is this?\n", "I'm eating my sweater right now out of boredom.\n", "zzzzzzzzzzz... sorry, what happened?\n", "3.14159265358979.\n", "To be or not to be.\n", "The yawning maw of existentialism creeps in a steady pace from sentence to sentence.\n", "Whether 'tis nobler to---I'm done w/ Shakespeare.\n", "I hope this was worth it.\n", "I'll never get these 15 minutes back.\n", "Damnit I lost count of how many I've created.\n", "I predict THIS ONE will show up in my demo. Ha I told you.\n", "This is a stock sentence.\n", "This sentence is copyright-protected.\n", "I probably miscounted and this one can't even show up.\n", "Sigh.\n", "Number 39 *maybe*.\n", "Number 40 *probably not*.\n"};
+      int randSent = (int) rand() % 40;
+      strcpy(sentence, extraSentences[randSent]);
+    }
+    else {
+      read(fdsToParent[i][READ], sentence, 128);
+    }
+    char middler[148];
+    sprintf(middler, "%d: %s->\n", i+1, sentence);
+    write(story, middler, strlen(middler));
+    int letsChanged = editSentence(sentence, difficulty);
+    if (! (difficulty == 'x' || difficulty == 'h')) {
+      * changed[j] = letsChanged;
+    }
+    char middler2[148];
+    sprintf(middler2, "%d: %s\n", i+1, sentence);
+    write(story, middler2, strlen(middler2));
+    write(fds[j][WRITE], sentence, sizeof(sentence));
   }
 }
 
@@ -129,8 +117,6 @@ int main() {
     numRounds = atoi(roundsStr);
   }
 
-  printf("numRounds: %d, numPlayers: %d\n", numRounds, numPlayers);
-
   printf("What difficulty mode would you like? \nType e for easy (changing 1/4 of the letters)\nm for medium (changing 1/3 of the letters) \nh for hard (strfrying every word) \nand x for xtreme (strfrying the whole thing)\n");
   char difficultyStr[16];
   fgets(difficultyStr, 16, stdin);
@@ -139,7 +125,6 @@ int main() {
   int shm = shmget(KEY, sizeof(char), IPC_CREAT | 0666);
   char * diff = shmat(shm, 0, 0);
   * diff = difficulty;
-  printf("Diff: %c, Difficulty: %c\n", * diff, difficulty);
   shmdt(diff);
 
   int shmArr[numPlayers];
@@ -224,9 +209,7 @@ int main() {
             write(to_client, randomSent, sizeof(randomSent));
           }
           read(from_client, sent, 128);
-          printf("Received sentence: %s\n", sent);
           if (currRound % numPlayers == numPlayers - 1) {
-            printf("Final sentence: %s\n", sent);
             char finaler[148];
             sprintf(finaler, "\n\nEND %d: %s", i, sent);
             write(story, finaler, strlen(finaler));
@@ -242,7 +225,5 @@ int main() {
       }
     }
   }
-
-
   return 0;
 }
