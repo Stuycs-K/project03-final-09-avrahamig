@@ -113,6 +113,10 @@ int main() {
   int players = 0;
   int childPids[numPlayers];
 
+  char opener[32] = "\n\n\nRound ";
+  char middler[132];
+  char currRoundStr[16];
+
   int p;
 
   int fds[numPlayers][2];
@@ -121,6 +125,9 @@ int main() {
     pipe(fds[i]);
     pipe(fdsToParent[i]);
   }
+
+  int story = open("story.txt", O_WRONLY | O_CREAT | O_APPEND, 0666);
+  chmod("story.txt", 0666);
 
   char * extraSentences[64] = {"abcdefg\n", "hijklmnop\n", "qrstuv\n", "wxyz\n", "123456\n", "7890\n"};
 
@@ -149,16 +156,23 @@ int main() {
       close(fdsToParent[i][WRITE]);
     }
     for (int currRound = 0; currRound < numPlayers - 1; currRound++) {
+      sprintf(currRoundStr, "%d:\n\n", currRound+1);
+      strcat(opener, currRoundStr);
+      write(story, opener, strlen(opener));
       for (int i = 0; i < numPlayers; i++) {
         int j = reset(i, numPlayers);
         char sentence[128] = "";
         read(fdsToParent[i][READ], sentence, 128);
         printf("Parent received sentence: %s\n", sentence);
-        write();
+        sprintf(middler, "%d: %s\n", i+1, sentence);
+        write(story, middler, strlen(middler));
         write(fds[j][WRITE], sentence, sizeof(sentence));
       }
     }
     for (int currRound = numPlayers; currRound < numRounds; currRound++) {
+      sprintf(currRoundStr, "%d", currRound+1);
+      strcat(opener, currRoundStr);
+      write(story, opener, strlen(opener));
       for (int i = 0; i < numPlayers; i++) {
         char sentence[128] = "";
         int j = reset(i, numPlayers);
@@ -166,7 +180,10 @@ int main() {
           char finalSentence[128] = "";
           read(fdsToParent[i][READ], finalSentence, 128);
           printf("Final sentence (in parent): %s\n", finalSentence);
-          //write finalSentence to file, execvp
+
+          char end[132];
+          sprintf(end, "%d: %s\n", i+1, finalSentence);
+          write(story, end, sizeof(end));
           int randSent = (int) rand() % 6;
           strcpy(sentence, extraSentences[randSent]);
           int letsChanged = editSentence(sentence, difficulty);
@@ -178,6 +195,8 @@ int main() {
           read(fdsToParent[i][READ], sentence, 128);
         }
         printf("Parent received sentence: %s\n", sentence);
+        sprintf(middler, "%d: %s\n", i+1, sentence);
+        write(story, middler, strlen(middler));
         write(fds[j][WRITE], sentence, sizeof(sentence));
       }
     }
