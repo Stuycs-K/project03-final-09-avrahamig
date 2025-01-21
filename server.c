@@ -18,6 +18,39 @@ int reset(int i, int numPlayers) {
   return j;
 }
 
+void transition(int currRound, int * * changed, int doIt) {
+  char opener[32];
+  sprintf(opener, "\n\n\nRound %d:\n\n", currRound+1);
+  write(story, opener, strlen(opener));
+  for (int i = 0; i < numPlayers; i++) {
+    char sentence[128] = "";
+    int j = reset(i, numPlayers);
+    if (doIt && currRound % numPlayers == 0) {
+      char finalSentence[128] = "";
+      read(fdsToParent[i][READ], finalSentence, 128);
+      printf("Final sentence (in parent): %s\n", finalSentence);
+
+      char end[132];
+      sprintf(end, "%d: %s\n", i+1, finalSentence);
+      write(story, end, strlen(end));
+      int randSent = (int) rand() % 6;
+      strcpy(sentence, extraSentences[randSent]);
+    }
+    else {
+      read(fdsToParent[i][READ], sentence, 128);
+    }
+    int letsChanged = editSentence(sentence, difficulty);
+    if (! (difficulty == 'x' || difficulty == 'h')) {
+      * changed[j] = letsChanged;
+    }
+    printf("Parent received sentence: %s\n", sentence);
+    char middler[132];
+    sprintf(middler, "%d: %s\n", i+1, sentence);
+    write(story, middler, strlen(middler));
+    write(fds[j][WRITE], sentence, sizeof(sentence));
+  }
+}
+
 int editSentence(char * original, char mode) {
   int len = strlen(original) - 1;
   if (mode == 'x') {
@@ -152,57 +185,10 @@ int main() {
       close(fdsToParent[i][WRITE]);
     }
     for (int currRound = 0; currRound < numPlayers - 1; currRound++) {
-      char opener[32];
-      sprintf(opener, "\n\n\nRound %d:\n\n", currRound+1);
-      write(story, opener, strlen(opener));
-      for (int i = 0; i < numPlayers; i++) {
-        int j = reset(i, numPlayers);
-        char sentence[128] = "";
-        read(fdsToParent[i][READ], sentence, 128);
-        int letsChanged = editSentence(sentence, difficulty);
-        if (! (difficulty == 'x' || difficulty == 'h')) {
-          int j = reset(i, numPlayers);
-          * changed[j] = letsChanged;
-        }
-        printf("Parent received sentence: %s\n", sentence);
-        char middler[132];
-        sprintf(middler, "%d: %s\n", i+1, sentence);
-        write(story, middler, strlen(middler));
-        write(fds[j][WRITE], sentence, sizeof(sentence));
-      }
+      transition(currRound, changed, 1);
     }
     for (int currRound = numPlayers; currRound < numRounds; currRound++) {
-      char opener[32];
-      sprintf(opener, "\n\n\nRound %d:\n\n", currRound+1);
-      write(story, opener, strlen(opener));
-      for (int i = 0; i < numPlayers; i++) {
-        char sentence[128] = "";
-        int j = reset(i, numPlayers);
-        if (currRound % numPlayers == 0) {
-          char finalSentence[128] = "";
-          read(fdsToParent[i][READ], finalSentence, 128);
-          printf("Final sentence (in parent): %s\n", finalSentence);
-
-          char end[132];
-          sprintf(end, "%d: %s\n", i+1, finalSentence);
-          write(story, end, strlen(end));
-          int randSent = (int) rand() % 6;
-          strcpy(sentence, extraSentences[randSent]);
-        }
-        else {
-          read(fdsToParent[i][READ], sentence, 128);
-        }
-        int letsChanged = editSentence(sentence, difficulty);
-        if (! (difficulty == 'x' || difficulty == 'h')) {
-          int j = reset(i, numPlayers);
-          * changed[j] = letsChanged;
-        }
-        printf("Parent received sentence: %s\n", sentence);
-        char middler[132];
-        sprintf(middler, "%d: %s\n", i+1, sentence);
-        write(story, middler, strlen(middler));
-        write(fds[j][WRITE], sentence, sizeof(sentence));
-      }
+      transition(currRound, changed, 1);
     }
     for (int i = 0; i < numPlayers; i++) {
       shmdt(changed[i]);
