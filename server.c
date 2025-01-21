@@ -10,6 +10,14 @@ static void sighandler(int signo) {
   }
 }
 
+int reset(int i, int numPlayers) {
+  int j = i+1;
+  if (j == numPlayers) {
+    j = 0;
+  }
+  return j;
+}
+
 int editSentence(char * original, char mode) {
   int len = strlen(original) - 1;
   if (mode == 'x') {
@@ -142,12 +150,9 @@ int main() {
     }
     for (int currRound = 0; currRound < numPlayers - 1; currRound++) {
       for (int i = 0; i < numPlayers; i++) {
+        int j = reset(i, numPlayers);
         char sentence[128] = "";
         read(fdsToParent[i][READ], sentence, 128);
-        int j = i+1;
-        if (j == numPlayers) {
-          j = 0;
-        }
         printf("Parent received sentence: %s\n", sentence);
         write(fds[j][WRITE], sentence, sizeof(sentence));
       }
@@ -155,6 +160,7 @@ int main() {
     for (int currRound = numPlayers; currRound < numRounds; currRound++) {
       for (int i = 0; i < numPlayers; i++) {
         char sentence[128] = "";
+        int j = reset(i, numPlayers);
         if (currRound % numPlayers == 0) {
           char finalSentence[128] = "";
           read(fdsToParent[i][READ], finalSentence, 128);
@@ -164,15 +170,11 @@ int main() {
           strcpy(sentence, extraSentences[randSent]);
           int letsChanged = editSentence(sentence, difficulty);
           if (! (difficulty == 'x' || difficulty == 'h')) {
-            * changed[i] = letsChanged;
+            * changed[j] = letsChanged;
           }
         }
         else {
           read(fdsToParent[i][READ], sentence, 128);
-        }
-        int j = i+1;
-        if (j == numPlayers) {
-          j = 0;
         }
         printf("Parent received sentence: %s\n", sentence);
         write(fds[j][WRITE], sentence, sizeof(sentence));
@@ -213,7 +215,8 @@ int main() {
             else {
               int letsChanged = editSentence(sent, difficulty);
               if (! (difficulty == 'x' || difficulty == 'h')) {
-                * changed[i] = letsChanged;
+                int j = reset(i, numPlayers);
+                * changed[j] = letsChanged;
               }
               printf("Edited sentence: %s\n", sent);
               write(fdsToParent[i][WRITE], sent, sizeof(sent));
