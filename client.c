@@ -46,8 +46,9 @@ int main() {
       printf("%d letters were changed\n", * changed);
     }
     printf("What do you think it was supposed to say? (Reminder, difficulty is %c). Enter below:\n", * diff);
-    shmdt(diff);
     fgets(sent, 128, stdin);
     write(to_server, sent, sizeof(sent));
   }
+  shmdt(diff);
+  return 0;
 }

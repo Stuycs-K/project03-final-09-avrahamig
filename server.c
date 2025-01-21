@@ -62,14 +62,24 @@ int editSentence(char * original, char mode) {
   return letsChanged;
 }
 
-int main(int argc, char * argv[]) {
-  if (argc == 1) {
-    printf("Please include the number of players as a command line argument. \nIf you would like an more rounds than the number of players (more games will be created by pre-generated sentences), add a second command line argument with the number of rounds.\n");
-    return 0;
-  }
-
+int main() {
   signal(SIGINT, sighandler);
   signal(SIGPIPE, sighandler);
+
+  printf("Please indicate the number of players.\n");
+  char playersStr[16];
+  fgets(playersStr, 16, stdin);
+  int numPlayers = atoi(playersStr);
+
+  int numRounds = numPlayers;
+  printf("How many rounds would you like to play? To get the generic amount just hit enter\n");
+  char roundsStr[16];
+  fgets(roundsStr, 16, stdin);
+  if (strcmp(roundsStr, "\n")) {
+    numRounds = atoi(roundsStr);
+  }
+
+  printf("numRounds: %d, numPlayers: %d\n", numRounds, numPlayers);
 
   printf("What difficulty mode would you like? \nType e for easy (changing 1/4 of the letters)\nm for medium (changing 1/3 of the letters) \nh for hard (strfrying every word) \nand x for xtreme (strfrying the whole thing)\n");
   char difficultyStr[16];
@@ -81,12 +91,6 @@ int main(int argc, char * argv[]) {
   * diff = difficulty;
   printf("Diff: %c, Difficulty: %c\n", * diff, difficulty);
   shmdt(diff);
-
-  int numPlayers = atoi(argv[1]);
-  int numRounds = numPlayers;
-  if (argc == 3) {
-    numRounds = atoi(argv[2]);
-  }
 
   int shmArr[numPlayers];
   int * changed[numPlayers];

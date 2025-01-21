@@ -1,4 +1,8 @@
-all: player setup
+compile: player setup
+
+run: setup
+	@./setup
+
 player: client.o pipe_networking.o
 	@gcc -o player client.o pipe_networking.o
 
