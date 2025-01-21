@@ -43,12 +43,21 @@ int editSentence(char * original, char mode) {
   if (mode == 'e') {
     numLets = len / 4;
   }
+  int letsChanged = 0;
+  char * track[numLets] = (char *) malloc(numLets * sizeof(char));
   for (int i = 0; i < numLets; i++) {
     int rando = (int) rand() % (len - 1);
+    for (int j = 0; j < i; j++) {
+      if (track[j] == (char) rando) {
+        letsChanged--;
+        break;
+      }
+    }
+    letsChanged++;
     char letter = (int) rand() % 69 + 58;
     original[rando] = letter;
   }
-  return 0;
+  return letsChanged;
 }
 
 int main(int argc, char * argv[]) {
@@ -75,6 +84,13 @@ int main(int argc, char * argv[]) {
   int numRounds = numPlayers;
   if (argc == 3) {
     numRounds = atoi(argv[2]);
+  }
+
+  int shmArr[numPlayers];
+  int * changed[numPlayers];
+  for (int i = 0; i < numPlayers; i++) {
+    shmArr[i] = shmget(KEY+i+1, sizeof(int), IPC_CREAT | 0666);
+    * changed[i] = shmat(shmArr[i], 0, 0);
   }
 
   int to_client;
@@ -140,7 +156,10 @@ int main(int argc, char * argv[]) {
           //write finalSentence to file, execvp
           int randSent = (int) rand() % 6;
           strcpy(sentence, extraSentences[randSent]);
-          editSentence(sentence, difficulty);
+          int letsChanged = editSentence(sentence, difficulty);
+          if (! (difficulty == 'x' || difficulty == 'h')) {
+            * changed[i] = letsChanged;
+          }
         }
         else {
           read(fdsToParent[i][READ], sentence, 128);
@@ -152,6 +171,10 @@ int main(int argc, char * argv[]) {
         printf("Parent received sentence: %s\n", sentence);
         write(fds[j][WRITE], sentence, sizeof(sentence));
       }
+    }
+    for (int i = 0; i < numPlayers; i++) {
+      shmdt(changed[i]);
+      shmctl(shmArr[i], IPC_RMID, 0);
     }
     shmctl(shm, IPC_RMID, 0);
   }
@@ -179,7 +202,10 @@ int main(int argc, char * argv[]) {
               write(fdsToParent[i][WRITE], sent, sizeof(sent));
             }
             else {
-              editSentence(sent, difficulty);
+              int letsChanged = editSentence(sent, difficulty);
+              if (! (difficulty == 'x' || difficulty == 'h')) {
+                * changed[i] = letsChanged;
+              }
               printf("Edited sentence: %s\n", sent);
               write(fdsToParent[i][WRITE], sent, sizeof(sent));
               read(fds[i][READ], sentFromPar, 128);
