@@ -44,11 +44,11 @@ int editSentence(char * original, char mode) {
     numLets = len / 4;
   }
   int letsChanged = 0;
-  char * track[numLets] = (char *) malloc(numLets * sizeof(char));
+  int * track = (int *) malloc(numLets * sizeof(int));
   for (int i = 0; i < numLets; i++) {
     int rando = (int) rand() % (len - 1);
     for (int j = 0; j < i; j++) {
-      if (track[j] == (char) rando) {
+      if (track[j] == rando) {
         letsChanged--;
         break;
       }
@@ -56,7 +56,9 @@ int editSentence(char * original, char mode) {
     letsChanged++;
     char letter = (int) rand() % 69 + 58;
     original[rando] = letter;
+    track[i] = rando;
   }
+  free(track);
   return letsChanged;
 }
 
@@ -90,7 +92,7 @@ int main(int argc, char * argv[]) {
   int * changed[numPlayers];
   for (int i = 0; i < numPlayers; i++) {
     shmArr[i] = shmget(KEY+i+1, sizeof(int), IPC_CREAT | 0666);
-    * changed[i] = shmat(shmArr[i], 0, 0);
+    changed[i] = shmat(shmArr[i], 0, 0);
   }
 
   int to_client;
@@ -187,6 +189,9 @@ int main(int argc, char * argv[]) {
         char numRoundsStr[16];
         sprintf(numRoundsStr, "%d", numRounds);
         write(to_client, numRoundsStr, 16);
+        char iStr[16];
+        sprintf(iStr, "%d", i);
+        write(to_client, iStr, 16);
         for (int currRound = 0; currRound < numRounds; currRound++) {
           char sent[128] = "";
           char sentFromPar[128] = "";
