@@ -180,7 +180,7 @@ int main() {
 
           char end[132];
           sprintf(end, "%d: %s\n", i+1, finalSentence);
-          write(story, end, sizeof(end));
+          write(story, end, strlen(end));
           int randSent = (int) rand() % 6;
           strcpy(sentence, extraSentences[randSent]);
           int letsChanged = editSentence(sentence, difficulty);
@@ -244,7 +244,9 @@ int main() {
           }
           else {
             printf("Final sentence: %s\n", sent);
-            //execvp
+            char finaler[132];
+            sprintf(finaler, "END %d: %s\n", i, sent);
+            write(story, finaler, strlen(finaler));
           }
         }
       }
