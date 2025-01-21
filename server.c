@@ -1,4 +1,3 @@
-
 #include "pipe_networking.h"
 
 static void sighandler(int signo) {
@@ -83,9 +82,9 @@ printf("hi2\n");
       if (doIt && currRound % numPlayers == 0) {
         char done[16] = "";
         read(fdsToParent[i][READ], done, 16);
-        char * extraSentences[64] = {"abcdefg\n", "hijklmnop\n", "qrstuv\n", "wxyz\n", "123456\n", "7890\n"};
+        char * extraSentences[64] = {"abcdefg\n", "hijklmnop\n", "qrstuv\n", "wxyz\n", "I have to type sentences.\n", "Dr. Seuss wrote The Cat in the Hat.\n", "Running out of ideas.\n", "Pneumonoultramicroscopicsilicovolcanoconiosis.\n", "I am having a good time.\n", "Writing these extra sentences at 2:30 AM.\n", "Life is enjoyable.\n", "This is propaganda.\n", "Whoever reads this, I hope you have a good day.\n", "This sentence was AI-generated.\n", "HELP! I NEED SOMEBODY!\n", "HELP! NOT JUST ANYBODY!\n", "HELP! YOU KNOW I NEED SOMEONE (to write these sentences for me)!\n", "The weather is cloudy.\n", "Banananananananana.\n", "I feel fulfillment writing these.\n", "life is meaningless anyway.\n", "We must fight back against industrial society!\n", "It's like 40 degrees in here help.\n", "How many sentences is this?\n", "I'm eating my sweater right now out of boredom.\n", "zzzzzzzzzzz... sorry, what happened?\n", "3.14159265358979.\n", "To be or not to be.\n", "The yawning maw of existentialism creeps in a steady pace from sentence to sentence.\n", "Whether 'tis nobler to---I'm done w/ Shakespeare.\n", "I hope this was worth it.\n", "I'll never get these 15 minutes back.\n", "Damnit I lost count of how many I've created.\n", "I predict THIS ONE will show up in my demo. Ha I told you.\n", "This is a stock sentence.\n", "This sentence is copyright-protected.\n", "I probably miscounted and this one can't even show up.\n", "Sigh.\n", "Number 39 *maybe*.\n", "Number 40 *probably not*.\n"};
 printf("hi3\n");
-        int randSent = (int) rand() % 6;
+        int randSent = (int) rand() % 40;
         strcpy(sentence, extraSentences[randSent]);
       }
       else {
